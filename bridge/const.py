@@ -46,7 +46,7 @@ class Div(Enum):
 
 ##################################################
 # GAME SETTING CONSTS
-DIV = Div.C
+DIV = Div.B
 COLOR = Color.BLUE
 POLARITY = 1  # -1 если ворота синих на +x; 1 если ворота синих на -x
 
