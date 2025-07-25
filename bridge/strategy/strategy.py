@@ -81,3 +81,6 @@ class Strategy:
         - actions[9] = Actions.BallGrab(0.0)
                 The robot number 9 grabs the ball at an angle of 0.0 (it looks to the right, along the OX axis)
         """
+        #actions[1] = Actions.GoToPointIgnore(aux.Point(0, 0), 0)
+        #actions[1] = Actions.GoToPointIgnore(aux.Point(0, 0), (field.ball.get_pos() - field.b_team[1].get_pos()).arg())
+        actions[1] = Actions.GoToPointIgnore(field.y_team[1].get_pos(), 0)
