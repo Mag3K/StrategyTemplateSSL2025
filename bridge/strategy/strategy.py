@@ -18,6 +18,7 @@ class Strategy:
         self,
     ) -> None:
         self.we_active = False
+        self.stade = 0
 
     def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
@@ -85,4 +86,19 @@ class Strategy:
         #actions[1] = Actions.GoToPointIgnore(aux.Point(0, 0), (field.ball.get_pos() - field.b_team[1].get_pos()).arg())
         #actions[1] = Actions.GoToPointIgnore(aux.point_on_line(field.b_team[0].get_pos(), field.y_team[0].get_pos(), aux.dist(field.b_team[0].get_pos(), field.y_team[0].get_pos()) / 8 * 1), ((field.y_team[0].get_pos() - field.b_team[1].get_pos()).arg()))
         #actions[1] = Actions.GoToPointIgnore(aux.rotate(aux.Point(500, 0), (3.14 / 4 * 1) + time() / 3) + field.ball.get_pos(), (field.ball.get_pos() - field.b_team[1].get_pos()).arg())
-        actions[1] = Actions.GoToPointIgnore(, 0)
+        #field.strategy_image.draw_circle(aux.Point(0, 0), (255, 0, 0), 300)
+
+        if self.stade == 0:
+            if aux.dist(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.ally_goal.hull), field.b_team[1].get_pos()) < aux.dist(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.enemy_goal.hull), field.b_team[1].get_pos()):
+                actions[1] = Actions.GoToPointIgnore(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.ally_goal.hull), 0)
+            else:
+                actions[1] = Actions.GoToPointIgnore(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.enemy_goal.hull), 0)
+
+        if aux.dist(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.ally_goal.hull), field.b_team[1].get_pos()) < 150 or aux.dist(aux.nearest_point_in_poly(field.b_team[1].get_pos(), field.enemy_goal.hull), field.b_team[1].get_pos()) < 150:
+            self.stade = 1
+
+        if self.stade == 1:
+            actions[1] = Actions.GoToPointIgnore(field.ball.get_pos(), 0)
+
+        if aux.dist(field.ball.get_pos(), field.b_team[1].get_pos()) < 150:
+            self.stade = 0
