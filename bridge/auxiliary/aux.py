@@ -527,7 +527,7 @@ def det(a: float, b: float, c: float, d: float) -> float:
         float: The determinant value.
     """
     return a * d - b * c
-
+    
 
 def nearest_point_on_poly(point: Point, polygon: list[Point]) -> Point:
     """
