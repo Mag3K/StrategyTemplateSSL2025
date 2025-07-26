@@ -116,6 +116,7 @@ class Strategy:
             self.stade = 0
         '''
 
+        '''
         self.Point11 = field.y_team[0].get_pos()
         self.Point12 = aux.rotate(aux.Point(self.dist, 0), (field.y_team[0].get_angle())) + field.y_team[0].get_pos()
 
@@ -140,7 +141,37 @@ class Strategy:
         if self.Point33 is not None:
             field.strategy_image.draw_circle(self.Point33, (0, 0, 0), 20)
 
-        #self.Point5 = (self.Point31 + self.Point32 + self.Point33) / 3
+        if self.Point31 is not None and self.Point32 is not None and self.Point33 is not None:
+            self.Point5 = (self.Point31 + self.Point32 + self.Point33) / 3
 
-        #if self.Point5 is not None:
-        #    field.strategy_image.draw_circle(self.Point5, (255, 255, 255), 20)
+            if self.Point5 is not None:
+                field.strategy_image.draw_circle(self.Point5, (255, 255, 255), 20)
+        '''
+
+        self.Point11 = field.b_team[0].get_pos()
+        self.Point12 = field.ball.get_pos()
+        field.strategy_image.draw_line(self.Point11, self.Point12, (0, 255, 255), 15)
+
+        #self.Point21 = aux.nearest_point_on_poly(field.b_team[1].get_pos(), (self.Point11, self.Point12))
+        self.Point22 = (self.Point12 - self.Point11).unity() * 500 + field.ball.get_pos()
+
+        self.Point31 = field.y_team[0].get_pos()
+        self.Point32 = field.y_team[5].get_pos()
+
+        field.strategy_image.draw_line(self.Point11, self.Point31, (255, 0, 255), 15)
+        field.strategy_image.draw_line(self.Point11, self.Point32, (255, 0, 255), 15)
+
+        self.Point41 = aux.closest_point_on_line(self.Point11, self.Point31, self.Point22, "L")
+
+        field.strategy_image.draw_line(self.Point22, self.Point41, (255, 255, 0), 15)
+        field.strategy_image.draw_circle(self.Point41, (0, 0, 0), 30)
+
+        self.Point42 = aux.closest_point_on_line(self.Point11, self.Point32, self.Point22, "L")
+
+        field.strategy_image.draw_line(self.Point22, self.Point42, (255, 255, 0), 15)
+        field.strategy_image.draw_circle(self.Point42, (0, 0, 0), 30)
+
+        if aux.dist(self.Point22, self.Point41) > aux.dist(self.Point22, self.Point42):
+            actions[1] = Actions.GoToPointIgnore(self.Point42, 0)
+        else:
+            actions[1] = Actions.GoToPointIgnore(self.Point41, 0)
