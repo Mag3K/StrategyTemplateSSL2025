@@ -83,4 +83,6 @@ class Strategy:
         """
         #actions[1] = Actions.GoToPointIgnore(aux.Point(0, 0), 0)
         #actions[1] = Actions.GoToPointIgnore(aux.Point(0, 0), (field.ball.get_pos() - field.b_team[1].get_pos()).arg())
-        actions[1] = Actions.GoToPointIgnore(field.y_team[1].get_pos(), 0)
+        #actions[1] = Actions.GoToPointIgnore(aux.point_on_line(field.b_team[0].get_pos(), field.y_team[0].get_pos(), aux.dist(field.b_team[0].get_pos(), field.y_team[0].get_pos()) / 8 * 1), ((field.y_team[0].get_pos() - field.b_team[1].get_pos()).arg()))
+        #actions[1] = Actions.GoToPointIgnore(aux.rotate(aux.Point(500, 0), (3.14 / 4 * 1) + time() / 3) + field.ball.get_pos(), (field.ball.get_pos() - field.b_team[1].get_pos()).arg())
+        actions[1] = Actions.GoToPointIgnore(, 0)
