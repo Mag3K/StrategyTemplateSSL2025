@@ -141,7 +141,7 @@ match DIV:
         GOAL_DX = 1 / 0  # не дорос ещё
 
     case Div.B:
-        GOAL_DX = 4000
+        GOAL_DX = 4500
         GOAL_DY = 1000
         GOAL_PEN_DX = 1000
         GOAL_PEN_DY = 2000
