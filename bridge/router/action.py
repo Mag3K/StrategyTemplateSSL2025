@@ -11,9 +11,9 @@ class ActionValues:
 
     vel = aux.Point(0, 0)
     angle = 0.0
-    kick_up = 0
-    kick_forward = 0
-    auto_kick = 0
+    kick_up = False
+    kick_forward = False
+    auto_kick = 0  # 0-lower, 1-upper
     kicker_voltage = 0
     dribbler_speed = 0
     beep = 0  # MOST IMPORTANT

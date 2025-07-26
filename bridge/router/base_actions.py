@@ -63,7 +63,7 @@ class Actions:
             cur_vel_abs = aux.rotate(current_action.vel, cur_robot.get_angle())
             prev_vel_abs = aux.rotate(cur_robot.prev_sended_vel, cur_robot.prev_sended_angle)
             if (cur_vel_abs - prev_vel_abs).mag() / (time() - cur_robot.prev_sended_time) > const.MAX_ACCELERATION:
-                # domain.field.router_image.draw_dot(aux.Point(0, 1000), size_in_mms=200)
+                # domain.field.router_image.draw_circle(aux.Point(0, 1000), size_in_mms=200)
                 current_action.vel = aux.rotate(
                     prev_vel_abs
                     + (cur_vel_abs - prev_vel_abs).unity() * const.MAX_ACCELERATION * (time() - cur_robot.prev_sended_time),
@@ -118,7 +118,7 @@ class Actions:
             if pint is not None:
                 convex_hull = qh.shortesthull(domain.robot.get_pos(), next_point, domain.field.enemy_goal.big_hull)
                 for j in range(len(convex_hull) - 2, 0, -1):
-                    domain.field.path_image.draw_dot(convex_hull[j], (150, 0, 150), 100)
+                    domain.field.path_image.draw_circle(convex_hull[j], (150, 0, 150), 100)
                     next_point = convex_hull[j]
 
             avoid_ball = domain.game_state in [GameStates.STOP, GameStates.PREPARE_KICKOFF] or not domain.we_active
@@ -380,75 +380,75 @@ def get_grab_speed(
     vel_r = vel_to_catch_r * (1 - board) + vel_to_align_r * board
     vel = vel_to_align + aux.rotate(aux.RIGHT, grab_angle) * vel_r
 
-    if aux.dist(robot_pos, grab_point) < 500:
-        draw_grabbing_image(
-            field,
-            grab_point,
-            grab_angle,
-            robot_pos,
-            transl_vel,
-            vel_to_catch,
-            vel,
-        )
+    # if aux.dist(robot_pos, grab_point) < 500:
+    #     draw_grabbing_image(
+    #         field,
+    #         grab_point,
+    #         grab_angle,
+    #         robot_pos,
+    #         transl_vel,
+    #         vel_to_catch,
+    #         vel,
+    #     )
 
     return vel
 
 
-def draw_grabbing_image(
-    field: fld.Field,
-    grab_point: aux.Point,
-    grab_angle: float,
-    robot_pos: aux.Point,
-    vel_to_align: aux.Point,
-    vel_to_catch: aux.Point,
-    vel: aux.Point,
-) -> None:
-    """Draw a screen easily debug grabbing a ball"""
-    ball = field.ball.get_pos()
+# def draw_grabbing_image(
+#     field: fld.Field,
+#     grab_point: aux.Point,
+#     grab_angle: float,
+#     robot_pos: aux.Point,
+#     vel_to_align: aux.Point,
+#     vel_to_catch: aux.Point,
+#     vel: aux.Point,
+# ) -> None:
+#     """Draw a screen easily debug grabbing a ball"""
+#     ball = field.ball.get_pos()
 
-    cord_scale = 0.8
-    vel_scale = 0.4
-    size = 200
-    angle = -grab_angle - math.pi / 2
-    if ball.x > 0:
-        middle = aux.Point(120, 680)
-    else:
-        middle = aux.Point(1080, 680)
+#     cord_scale = 0.8
+#     vel_scale = 0.4
+#     size = 200
+#     angle = -grab_angle - math.pi / 2
+#     if ball.x > 0:
+#         middle = aux.Point(120, 680)
+#     else:
+#         middle = aux.Point(1080, 680)
 
-    field.router_image.draw_rect(middle.x - size / 2, middle.y - size / 2, size, size, (200, 200, 200))
-    field.router_image.print(
-        middle - aux.Point(0, size / 2 + 10),
-        "GRABBING A BALL",
-        need_to_scale=False,
-    )
+#     field.router_image.draw_rect(middle.x - size / 2, middle.y - size / 2, size, size, (200, 200, 200))
+#     field.router_image.print(
+#         middle - aux.Point(0, size / 2 + 10),
+#         "GRABBING A BALL",
+#         need_to_scale=False,
+#     )
 
-    ball_screen = middle - aux.Point(0, size // 2 - 30)
-    center_boarder = convert_to_screen(ball_screen, cord_scale, angle, ball, grab_point)
-    center_boarder += aux.RIGHT / 2  # чтобы не мерцало, хз
-    field.router_image.draw_line(ball_screen, center_boarder, size_in_pixels=3, need_to_scale=False)
+#     ball_screen = middle - aux.Point(0, size // 2 - 30)
+#     center_boarder = convert_to_screen(ball_screen, cord_scale, angle, ball, grab_point)
+#     center_boarder += aux.RIGHT / 2  # чтобы не мерцало, хз
+#     field.router_image.draw_line(ball_screen, center_boarder, size_in_pixels=3, need_to_scale=False)
 
-    right_boarder = convert_to_screen(ball_screen, 1, -const.GRAB_OFFSET_ANGLE, ball_screen, center_boarder)
-    field.router_image.draw_line(ball_screen, right_boarder, size_in_pixels=3, need_to_scale=False)
+#     right_boarder = convert_to_screen(ball_screen, 1, -const.GRAB_OFFSET_ANGLE, ball_screen, center_boarder)
+#     field.router_image.draw_line(ball_screen, right_boarder, size_in_pixels=3, need_to_scale=False)
 
-    left_boarder = convert_to_screen(ball_screen, 1, const.GRAB_OFFSET_ANGLE, ball_screen, center_boarder)
-    field.router_image.draw_line(ball_screen, left_boarder, size_in_pixels=3, need_to_scale=False)
+#     left_boarder = convert_to_screen(ball_screen, 1, const.GRAB_OFFSET_ANGLE, ball_screen, center_boarder)
+#     field.router_image.draw_line(ball_screen, left_boarder, size_in_pixels=3, need_to_scale=False)
 
-    robot_screen = convert_to_screen(ball_screen, cord_scale, angle, ball, robot_pos)
-    cropped_robot = aux.Point(
-        aux.minmax(robot_screen.x, middle.x - size / 2, middle.x + size / 2),
-        aux.minmax(robot_screen.y, middle.y - size / 2, middle.y + size / 2),
-    )
-    field.router_image.draw_dot(cropped_robot, (0, 0, 0), 80, False)
+#     robot_screen = convert_to_screen(ball_screen, cord_scale, angle, ball, robot_pos)
+#     cropped_robot = aux.Point(
+#         aux.minmax(robot_screen.x, middle.x - size / 2, middle.x + size / 2),
+#         aux.minmax(robot_screen.y, middle.y - size / 2, middle.y + size / 2),
+#     )
+#     field.router_image.draw_circle(cropped_robot, (0, 0, 0), 80, False)
 
-    if cropped_robot == robot_screen:
-        vel_to_align_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel_to_align)
-        field.router_image.draw_line(robot_screen, vel_to_align_screen, (100, 100, 200), 2, need_to_scale=False)
-        vel_to_catch_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel_to_catch)
-        field.router_image.draw_line(robot_screen, vel_to_catch_screen, (200, 100, 100), 2, need_to_scale=False)
-        vel_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel)
-        field.router_image.draw_line(robot_screen, vel_screen, (200, 100, 200), 3, need_to_scale=False)
+#     if cropped_robot == robot_screen:
+#         vel_to_align_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel_to_align)
+#         field.router_image.draw_line(robot_screen, vel_to_align_screen, (100, 100, 200), 2, need_to_scale=False)
+#         vel_to_catch_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel_to_catch)
+#         field.router_image.draw_line(robot_screen, vel_to_catch_screen, (200, 100, 100), 2, need_to_scale=False)
+#         vel_screen = convert_to_screen(robot_screen, vel_scale, angle, aux.Point(0, 0), vel)
+#         field.router_image.draw_line(robot_screen, vel_screen, (200, 100, 200), 3, need_to_scale=False)
 
-    field.router_image.draw_dot(ball_screen, (255, 100, 100), 50, False)
+#     field.router_image.draw_circle(ball_screen, (255, 100, 100), 50, False)
 
 
 def spin_with_ball(w: float, flag: bool = False) -> tuple[aux.Point, float]:
@@ -509,13 +509,8 @@ def calc_passthrough_wp(
             )
 
         if (
-            aux.line_circle_intersect(
-                robot.get_pos(),
-                target,
-                ball.get_pos(),
-                const.ROBOT_R + ball.get_radius(),
-            )
-            is not None
+            len(aux.line_circle_intersect(robot.get_pos(), target, ball.get_pos(), const.ROBOT_R + ball.get_radius(), "S"))
+            > 0
         ):
             obstacles_dist.append((ball, aux.dist(ball.get_pos(), robot.get_pos())))
 
@@ -562,20 +557,12 @@ def calc_next_point(
             + const.ROBOT_R * (robot.get_vel().mag() / const.MAX_SPEED) * 1  # <-- coefficient of fear [0; 1] for fast speed
             + time_to_reach * obstacle.get_vel().mag() * 0.5  # <-- coefficient of fear [0; 1], for moving obst
         )
-        # field.path_image.draw_dot(
-        #     center,
-        #     (127, 127, 127),
-        #     radius,
-        # )
-        if (
-            aux.line_circle_intersect(
-                position,
-                target,
-                center,
-                radius,
-            )
-            is not None
-        ):
+        field.path_image.draw_circle(
+            center,
+            (127, 127, 127),
+            radius,
+        )
+        if len(aux.line_circle_intersect(position, target, center, radius, "S")) > 0:
             tangents = aux.get_tangent_points(center, position, radius)
             if tangents is None or len(tangents) < 2:
                 return None

@@ -2,20 +2,23 @@
 Модуль-прослойка между стратегией и отправкой пакетов на роботов
 """
 
-from time import time
-from typing import Optional
+from time import sleep, time
+from typing import List, Optional
 
 import attr
+import attrs
 import zmq
 from cattrs import unstructure
 from strategy_bridge.bus import DataBus, DataReader, DataWriter
 from strategy_bridge.processors import BaseProcessor
 
-import bridge.robot_command_model as rcm
 from bridge import const, drawing
-from bridge.auxiliary import aux, fld
+from bridge.auxiliary import aux, fld, rbt
 from bridge.processors.python_controller import RobotCommand
 from bridge.router.action import Action, ActionDomain, ActionValues
+
+UDP_IP = "10.0.120.210"
+UDP_PORT = 10000
 
 
 @attr.s(auto_attribs=True)
@@ -62,6 +65,7 @@ class CommandSink(BaseProcessor):
         """
         Метод обратного вызова процесса
         """
+        telemetry_message = drawing.get_wave() + "\n"
         updated = False
 
         new_field = self.field_reader.read_last()
@@ -84,7 +88,10 @@ class CommandSink(BaseProcessor):
         if updated:
             self.field[const.COLOR].router_image.timer.start(time())
             for color in [const.Color.BLUE, const.Color.YELLOW]:
-                team_commands: list[rcm.RobotCommand] = []
+                team_message: str = (
+                    f"TEAM {str(color)}\n \tr_id\tvelX\tvelY\tvelR\tangle\tkickUP\tkickFRW\tautoUP\tautoFRW\tvolt\tdrib\n"
+                )
+                team_commands: list[DecoderCommand] = []
                 for i in range(const.TEAM_ROBOTS_MAX_COUNT):
                     cur_action = self.actions[color][i]
                     if self.field[color].allies[i].is_used() and cur_action is not None:
@@ -99,73 +106,159 @@ class CommandSink(BaseProcessor):
                         values = ActionValues()
                         cur_action.process(domain, values)
 
-                        team_commands.append(command_from_values(i, values, domain))
+                        cur_command = command_from_values(domain.field, domain.robot, values)
+                        team_commands.append(cur_command)
+                        team_message += create_telemetry(cur_command)
 
                 if len(team_commands) > 0:
-                    control_data = rcm.RobotControlExt(
-                        isteamyellow=color == const.Color.YELLOW, robot_commands=team_commands
+                    control_data = DecoderTeamCommand(
+                        robot_commands=team_commands,
+                        isteamyellow=(color == const.Color.YELLOW),
                     )
 
-                    self.s_control.send_json({"transnet": "actuate_robot", "data": unstructure(control_data)})
+                    self.s_control.send_json({"control": "actuate_robot", "data": unstructure(control_data)})
+
+                telemetry_message += team_message
 
             self.field[const.COLOR].router_image.timer.end(time())
-            self.image_writer.write(self.field[const.COLOR].router_image)
             self.image_writer.write(self.field[const.COLOR].path_image)
             self.field_b.clear_images()
             self.field_y.clear_images()
 
+        self.field[const.COLOR].router_image.send_telemetry("COMMANDS TO ROBOTS", telemetry_message)
+        self.image_writer.write(self.field[const.COLOR].router_image)
 
-def command_from_values(r_id: int, values: ActionValues, domain: ActionDomain) -> rcm.RobotCommand:
+    def finalize(self) -> None:
+
+        team_commands: list[DecoderCommand] = []
+        for r_id in range(const.TEAM_ROBOTS_MAX_COUNT):
+            team_commands.append(
+                DecoderCommand(
+                    robot_id=r_id,
+                    kick_up=False,
+                    kick_forward=False,
+                    auto_kick_up=False,
+                    auto_kick_forward=False,
+                    kicker_setting=0,
+                    dribbler_setting=0,
+                    forward_vel=0,
+                    left_vel=0,
+                    angular_vel=0,
+                )
+            )
+
+        for _ in range(5):
+            for team in [True, False]:
+                control_data = DecoderTeamCommand(robot_commands=team_commands, isteamyellow=team)
+                self.s_control.send_json({"control": "actuate_robot", "data": unstructure(control_data)})
+            sleep(0.002)
+
+        self.s_control.close()
+
+
+def command_from_values(field: fld.Field, robot: rbt.Robot, values: ActionValues) -> "DecoderCommand":
     """Turn ActionValues to commands for robots"""
 
     if values.beep == 0:
-        domain.robot.update_vel_xy(values.vel)
-        aerr = aux.wind_down_angle(values.angle - domain.robot.get_angle())
+        robot.update_vel_xy(values.vel)
+        aerr = aux.wind_down_angle(values.angle - robot.get_angle())
         if const.IS_SIMULATOR_USED:
-            ang_vel = domain.robot.angle_reg.process(aerr, -domain.robot.get_anglevel())
-            domain.robot.update_vel_w(ang_vel)
+            ang_vel = robot.angle_reg.process(aerr, -robot.get_anglevel())
+            robot.update_vel_w(ang_vel)
         else:
-            domain.robot.delta_angle = aerr
+            robot.delta_angle = aerr
 
-        reg_vel = aux.Point(domain.robot.speed_x, -domain.robot.speed_y)
-        domain.field.router_image.draw_line(
-            domain.robot.get_pos(),
-            domain.robot.get_pos() + aux.rotate(reg_vel, domain.robot.get_angle()) * 10,
+        reg_vel = aux.Point(robot.speed_x, -robot.speed_y)
+        field.router_image.draw_line(
+            robot.get_pos(),
+            robot.get_pos() + aux.rotate(reg_vel, robot.get_angle()) * 50,
         )
     else:
         # print("manual speeds: ", values.vel, values.angle)
 
-        domain.robot.speed_x = -1 / domain.robot.k_xx * values.vel.x
-        domain.robot.speed_y = 1 / domain.robot.k_yy * values.vel.y
+        robot.speed_x = -1 / robot.k_xx * values.vel.x
+        robot.speed_y = 1 / robot.k_yy * values.vel.y
         if const.IS_SIMULATOR_USED:
-            domain.robot.update_vel_w(values.angle)
+            robot.update_vel_w(values.angle)
         else:
-            domain.robot.delta_angle = values.angle
+            robot.delta_angle = values.angle
 
-    kick_speed = values.kicker_voltage / 2 if (values.kick_forward or values.kick_up or values.auto_kick) else 0
-    kick_angle = 40 if (values.kick_up or values.auto_kick == 2) else 0
+    # return RobotCommand(
+    #     id=r_id,
+    #     move_command=RobotMoveCommand(
+    #         # wheel_velocity=MoveWheelVelocity(
+    #         #     front_right=0,
+    #         #     back_right=0,
+    #         #     back_left=0,
+    #         #     front_left=1,
+    #         # )
+    #         local_velocity=MoveLocalVelocity(
+    #             forward=-domain.robot.speed_x,
+    #             left=-domain.robot.speed_y,
+    #             angular=domain.robot.speed_r,
+    #         ),
+    #         # global_velocity=MoveGlobalVelocity(
+    #         #     x=1,
+    #         #     y=0,
+    #         #     angular=0,
+    #         # ),
+    #     ),
+    #     kick_speed=kick_speed,
+    #     kick_angle=kick_angle,
+    #     dribbler_speed=values.dribbler_speed,
+    # )
 
-    return rcm.RobotCommand(
-        id=r_id,
-        move_command=rcm.RobotMoveCommand(
-            # wheel_velocity=rcm.MoveWheelVelocity(
-            #     front_right=0,
-            #     back_right=0,
-            #     back_left=0,
-            #     front_left=1,
-            # )
-            local_velocity=rcm.MoveLocalVelocity(
-                forward=-domain.robot.speed_x,
-                left=-domain.robot.speed_y,
-                angular=domain.robot.speed_r,
-            ),
-            # global_velocity=rcm.MoveGlobalVelocity(
-            #     x=1,
-            #     y=0,
-            #     angular=0,
-            # ),
-        ),
-        kick_speed=kick_speed,
-        kick_angle=kick_angle,
-        dribbler_speed=values.dribbler_speed,
+    return DecoderCommand(
+        robot_id=robot.r_id,
+        kick_up=values.kick_up,
+        kick_forward=values.kick_forward,
+        auto_kick_up=values.auto_kick == 2,
+        auto_kick_forward=values.auto_kick == 1,
+        kicker_setting=values.kicker_voltage,
+        dribbler_setting=values.dribbler_speed,
+        forward_vel=robot.speed_x,
+        left_vel=-robot.speed_y,
+        angular_vel=robot.speed_r,
     )
+
+
+def create_telemetry(cmd: "DecoderCommand") -> str:
+    """Create line for telemetry for single robot"""
+    values = [
+        str(cmd.robot_id),
+        f"{cmd.forward_vel:.2f}",
+        f"{cmd.left_vel:.2f}",
+        f"{cmd.angular_vel:.2f}" if cmd.angular_vel is not None else "None",
+        f"{cmd.angle:.2f}" if cmd.angle is not None else "None",
+        str(cmd.kick_up),
+        str(cmd.kick_forward),
+        str(cmd.auto_kick_up),
+        str(cmd.auto_kick_forward),
+        str(cmd.kicker_setting),
+        str(cmd.dribbler_setting),
+    ]
+    return "\t" + "\t".join(values) + "\n"
+
+
+@attrs.define
+class DecoderCommand:
+    robot_id: int = attrs.field()
+
+    kick_up: bool = attrs.field()
+    kick_forward: bool = attrs.field()
+    auto_kick_up: bool = attrs.field()
+    auto_kick_forward: bool = attrs.field()
+
+    kicker_setting: int = attrs.field()  # 0-15 [popugi]
+    dribbler_setting: float = attrs.field()  # 0-15 [popugi]
+
+    forward_vel: float = attrs.field()  # [m/s]
+    left_vel: float = attrs.field()  # [m/s]
+    angular_vel: Optional[float] = attrs.field(default=None)  # [rad/s]
+    angle: Optional[float] = attrs.field(default=None)  # [rad]
+
+
+@attrs.define
+class DecoderTeamCommand:
+    robot_commands: List[DecoderCommand] = attrs.field(factory=list)
+    isteamyellow: bool = attrs.field(default=False)

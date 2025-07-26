@@ -45,8 +45,8 @@ class Robot(entity.Entity):
 
         # v! SIM
         if const.IS_SIMULATOR_USED:
-            self.k_xx: float = 1
-            self.k_yy: float = 1
+            self.k_xx: float = -1000
+            self.k_yy: float = 1000
             self.k_ww: float = 1
             self.k_wy = -0.001
             self.t_wy = 0.15
@@ -82,7 +82,7 @@ class Robot(entity.Entity):
         # gains_soft = gains_full
         if const.IS_SIMULATOR_USED:
             # gains_full = [8, 0.35, 0, const.MAX_SPEED]
-            gains_full = [0.0018, 0.06, 0.0, const.MAX_SPEED]
+            gains_full = [1.8, 0.06, 0.0, const.MAX_SPEED]
             gains_soft = gains_full
             a_gains_full = [8, 0.1, 0.1, const.MAX_SPEED_R]
         # a_gains_soft = [4, 0.07, 8, const.SOFT_MAX_SPEED_R]
