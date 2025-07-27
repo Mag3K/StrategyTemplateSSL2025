@@ -349,7 +349,7 @@ def rotate(vector: Point, angle: float) -> Point:
 
 
 def find_nearest_point(center: Point, points: list[Point], exclude: Optional[list[Point]] = None) -> Point:
-    """
+    """f
     Find the nearest point to a given point (center) from a list, optionally excluding some points.
 
     Args:
