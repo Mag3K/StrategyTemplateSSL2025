@@ -148,6 +148,7 @@ class Strategy:
                 field.strategy_image.draw_circle(self.Point5, (255, 255, 255), 20)
         '''
 
+        '''
         self.Point11 = field.b_team[0].get_pos()
         self.Point12 = field.ball.get_pos()
         field.strategy_image.draw_line(self.Point11, self.Point12, (0, 255, 255), 15)
@@ -175,3 +176,13 @@ class Strategy:
             actions[1] = Actions.GoToPointIgnore(self.Point42, 0)
         else:
             actions[1] = Actions.GoToPointIgnore(self.Point41, 0)
+        '''
+
+def choose_on_goal(field:fld.Field, actions: list[Action]) -> None:
+    field.strategy_image.draw_circle(field.enemy_goal.down - aux.Point(0, -50), (0, 0, 0), 10)
+    field.strategy_image.draw_circle(field.enemy_goal.up - aux.Point(0, 50), (0, 0, 0), 10)
+
+    if aux.dist(field.y_team[1].get_pos(), field.enemy_goal.down) > aux.dist(field.y_team[1].get_pos(), field.enemy_goal.up): 
+        actions[1] = Actions.Kick(field.enemy_goal.down - aux.Point(0, -50))
+    else:
+        actions[1] = Actions.Kick(field.enemy_goal.up - aux.Point(0, 50))
