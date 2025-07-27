@@ -1,5 +1,8 @@
 """High-level strategy code"""
 
+from bridge.strategy.attacker1 import Attacker1
+from bridge.strategy.goal_keeper import GoalKeeper
+
 # !v DEBUG ONLY
 import math  # type: ignore
 from time import time  # type: ignore
@@ -18,18 +21,8 @@ class Strategy:
         self,
     ) -> None:
         self.we_active = False
-        self.stade = 0
-        self.dist = 5000
-        self.Point11 = 0
-        self.Point12 = 0
-        self.Point21 = 0
-        self.Point22 = 0
-        self.Point41 = 0
-        self.Point42 = 0
-        self.Point31 = 0
-        self.Point32 = 0
-        self.Point33 = 0
-        self.Point5 = 0
+        self.Attacker1 = Attacker1()
+        self.GoalKeeper = GoalKeeper()
 
     def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
@@ -179,31 +172,23 @@ class Strategy:
         '''
 
         if field.ally_color == const.Color.BLUE:
-            field.strategy_image.draw_circle(field.enemy_goal.down - aux.Point(0, -100), (0, 0, 0), 10)
-            field.strategy_image.draw_circle(field.enemy_goal.up - aux.Point(0, 100), (0, 0, 0), 10)
 
+
+            #self.Attacker1.go(field, actions)
+            self.GoalKeeper.go(field, actions)
+
+        else:
+            None
+
+            '''
+            
             if aux.dist(field.y_team[0].get_pos(), field.enemy_goal.down) > aux.dist(field.y_team[0].get_pos(), field.enemy_goal.up): 
                 actions[1] = Actions.Kick(field.enemy_goal.down - aux.Point(0, -100))
             else:
                 actions[1] = Actions.Kick(field.enemy_goal.up - aux.Point(0, 100))
+            
+            '''
 
-
-        else:
-            self.Point11 = field.b_team[1].get_pos()
-            self.Point12 = field.ball.get_pos()
-
-            self.Point22 = (self.Point12 - self.Point11).unity() * 500 + field.ball.get_pos()
-
-            self.Point31 = field.ally_goal.down - aux.Point(0, -100)
-            self.Point32 = field.ally_goal.up - aux.Point(0, 100)
-
-            self.Point41 = aux.closest_point_on_line(self.Point11, self.Point31, self.Point22, "L")
-            self.Point42 = aux.closest_point_on_line(self.Point11, self.Point32, self.Point22, "L")
-
-            if aux.dist(self.Point22, self.Point41) > aux.dist(self.Point22, self.Point42):
-                actions[1] = Actions.GoToPoint(self.Point42, 3.14)
-            else:
-                actions[1] = Actions.GoToPoint(self.Point41, 3.14) 
 
 '''
 def choose_on_goal(field: fld.Field, actions: list[Action]) -> None:

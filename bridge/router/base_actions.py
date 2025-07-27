@@ -11,7 +11,7 @@ from bridge import const
 from bridge.auxiliary import aux, fld, rbt, tau
 from bridge.auxiliary.entity import Entity
 from bridge.router.action import Action, ActionDomain, ActionValues, limit_action
-from bridge.strategy.strategy import GameStates
+from bridge.const import State as GameStates
 
 # Actions: ActionDomain -> ActionValues
 
