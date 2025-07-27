@@ -18,6 +18,9 @@ if __name__ == "__main__":
         SSLController(
             ally_color=const.COLOR,
         ),
+        SSLController(
+            ally_color=const.COLOR.reverse(),
+        ),
         Drawer(),
         CommandSink(),
     ]
