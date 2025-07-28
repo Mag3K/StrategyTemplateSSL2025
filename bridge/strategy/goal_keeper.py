@@ -11,33 +11,97 @@ from bridge.router.base_actions import Action, Actions, KickActions  # type: ign
 class GoalKeeper:
     def __init__(self) -> None:
         self.Point52 = aux.Point(0, 0)
+        self.LastPoint53 = aux.Point(0, 0)
 
 
     def go(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
-        Point51 = field.ball.get_pos()
-        Point53 = aux.get_line_intersection(Point51, self.Point52, field.ally_goal.up - aux.Point(150, -100), field.ally_goal.up - aux.Point(150, 100), "LL")
+        if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
+            Point51 = field.ball.get_pos()
+            field.strategy_image.draw_line(Point51, self.Point52, (255, 255, 0), 10)
 
-        if field.is_ball_moves_to_goal():
+            settingsСrossbar1 = aux.Point(120, 50)
+            settingsСrossbar2 = aux.Point(120, -50)
+            settingsСrossbarCenter = aux.Point(120, 0)
+
+            Point53 = aux.get_line_intersection(Point51, self.Point52, field.ally_goal.up - settingsСrossbar1, field.ally_goal.down - settingsСrossbar2, "LL")
+            field.strategy_image.draw_circle(field.ally_goal.up - settingsСrossbar1, (0, 0, 0), 10)
+            field.strategy_image.draw_circle(field.ally_goal.down - settingsСrossbar2, (0, 0, 0), 10)
+
+            if field.is_ball_moves_to_goal():
+                
+                if Point53 is not None:
+
+                    self.LastPoint53 = Point53
+
+                    if Point53.y > (field.ally_goal.up).y:
+                        Point53.y = field.ally_goal.up.y 
+                        field.strategy_image.draw_circle(Point53, (100, 100, 100), 50)
+                    if Point53.y < (field.ally_goal.down).y:
+                        Point53.y = field.ally_goal.down.y 
+                        field.strategy_image.draw_circle(Point53, (100, 100, 100), 50)
+
+                    actions[0] = Actions.GoToPointIgnore(Point53, 3.14)
+                    field.strategy_image.draw_circle(Point53, (255, 0, 255), 30)
+                else:
+                    actions[0] = Actions.GoToPointIgnore(self.LastPoint53, 3.14)
+                    field.strategy_image.   draw_circle(self.LastPoint53, (0, 255, 0), 30)
+            else:
+                actions[0] = Actions.GoToPointIgnore(field.ally_goal.center - settingsСrossbarCenter, 3.14)
+                field.strategy_image.draw_circle(field.ally_goal.center - settingsСrossbarCenter, (255, 0, 0), 30)
+
             self.Point52 = Point51
-            
-            if Point53 is not None:
-
-                '''
-                if Point53.x > (field.ally_goal.up).x:
-                    Point53.x = field.ally_goal.up.x 
-                if Point53.x < (field.ally_goal.down).x:
-                    Point53.x = field.ally_goal.down.x 
-                '''
-
-                actions[0] = Actions.GoToPointIgnore(Point53, 0)
+            if field.is_ball_moves_to_goal():
+                if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51 and aux.dist(field.y_team[0].get_pos(), Point51) < 150:
+                    actions[0] = Actions.Kick(field.y_team[1].get_pos())
+                    field.strategy_image.draw_circle(Point51, (0, 255, 0), 50)
             else:
-                actions[0] = Actions.GoToPointIgnore(field.ally_goal.center + field.ally_goal.eye_forw * 500, 0)
-        else:
-            if Point53 is not None:
-                actions[0] = Actions.GoToPointIgnore(Point53, 0)
-                self.Point52 = field.ball.get_pos()
-            else:
-                actions[0] = Actions.GoToPointIgnore(field.ally_goal.center, 0)
-                self.Point52 = field.ball.get_pos()
+                if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
+                    actions[0] = Actions.Kick(field.y_team[1].get_pos())
+                    field.strategy_image.draw_circle(Point51, (0, 0, 255), 50)
+
+        else:  #--------------------------------------------------BLUE--------------------------------------------------
+            Point51 = field.ball.get_pos()
+            field.strategy_image.draw_line(Point51, self.Point52, (255, 255, 0), 10)
             
+            settingsСrossbar1 = aux.Point(-120, 50)
+            settingsСrossbar2 = aux.Point(-120, -50)
+            settingsСrossbarCenter = aux.Point(120, 0)
+            
+            Point53 = aux.get_line_intersection(Point51, self.Point52, field.ally_goal.up - settingsСrossbar1, field.ally_goal.down - settingsСrossbar2, "LL")
+            field.strategy_image.draw_circle(field.ally_goal.up - settingsСrossbar1, (0, 0, 0), 10)
+            field.strategy_image.draw_circle(field.ally_goal.down - settingsСrossbar2, (0, 0, 0), 10)
+
+            if field.is_ball_moves_to_goal():
+                
+                if Point53 is not None:
+
+                    self.LastPoint53 = Point53
+
+                    if Point53.y < (field.ally_goal.up).y:
+                        Point53.y = field.ally_goal.up.y 
+                        field.strategy_image.draw_circle(Point53, (100, 100, 100), 50)
+                    if Point53.y > (field.ally_goal.down).y:
+                        Point53.y = field.ally_goal.down.y 
+                        field.strategy_image.draw_circle(Point53, (100, 100, 100), 50)
+
+                    actions[0] = Actions.GoToPointIgnore(Point53, 0)
+                    field.strategy_image.draw_circle(Point53, (255, 0, 255), 30)
+                else:
+                    actions[0] = Actions.GoToPointIgnore(self.LastPoint53, 0)
+                    field.strategy_image.   draw_circle(self.LastPoint53, (0, 255, 0), 30)
+            else:
+                actions[0] = Actions.GoToPointIgnore(field.ally_goal.center - aux.Point(-120, 0), 0)
+                field.strategy_image.draw_circle(field.ally_goal.center - aux.Point(-120, 0), (255, 0, 0), 30)
+
+            self.Point52 = Point51
+            if field.is_ball_moves_to_goal():
+                if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51 and aux.dist(field.b_team[0].get_pos(), Point51) < 150:
+                    if aux.dist(field.b_team[1].get_pos(), aux.Point(0, 0)) < 10:
+                        actions[0] = Actions.Kick(field.b_team[1].get_pos())
+                        field.strategy_image.draw_circle(Point51, (0, 255, 0), 50)
+            else:
+                if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
+                    if aux.dist(field.b_team[1].get_pos(), aux.Point(0, 0)) < 10:
+                        actions[0] = Actions.Kick(field.b_team[1].get_pos())
+                        field.strategy_image.draw_circle(Point51, (0, 0, 255), 50)
 
