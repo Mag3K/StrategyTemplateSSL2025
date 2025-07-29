@@ -47,7 +47,7 @@ class Div(Enum):
 ##################################################
 # GAME SETTING CONSTS
 DIV = Div.C
-COLOR = Color.BLUE
+COLOR = Color.YELLOW
 POLARITY = 1  # -1 если ворота синих на +x; 1 если ворота синих на -x
 
 IS_SIMULATOR_USED = False
