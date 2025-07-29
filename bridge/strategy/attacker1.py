@@ -11,6 +11,7 @@ class Attacker1:
     def __init__(self) -> None:
         self.Point52 = aux.Point(0, 0)
         self.attack = False
+        self.timer: Optional[float] = None
 
     def go(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
         if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
@@ -29,14 +30,14 @@ class Attacker1:
 
             Point22 = (Point12 - Point11).unity() * 200 + field.ball.get_pos()
 
-            Point31 = field.ally_goal.down - aux.Point(0, 100)
-            Point32 = field.ally_goal.up - aux.Point(0, -100)
+            Point31 = field.ally_goal.down - aux.Point(0, 100 * field.polarity)
+            Point32 = field.ally_goal.up - aux.Point(0, -100 * field.polarity)
 
             field.strategy_image.draw_circle(Point31, (0, 255, 0), 40)
             field.strategy_image.draw_circle(Point32, (0, 255, 0), 40)
 
-            Point41 = aux.closest_point_on_line(Point11, Point31, Point22, "L")
-            Point42 = aux.closest_point_on_line(Point11, Point32, Point22, "L")
+            Point41 = aux.closest_point_on_line(Point11, Point31, Point22, "R")
+            Point42 = aux.closest_point_on_line(Point11, Point32, Point22, "R")
 
             Point51 = field.ball.get_pos()
 
@@ -58,10 +59,23 @@ class Attacker1:
                     actions[1] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), 0)
 
             elif self.attack == True:
+                #actions[1] = Actions.CatchBall(field.b_team[1].get_pos(), field.b_team[1].get_angle())
+                '''
                 field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 0, 0), 130)
-                if aux.dist(field.b_team[1].get_pos(), field.ball.get_pos()) < 300:
-                    actions[1] = Actions.Kick(field.b_team[2].get_pos())
+                if aux.dist(field.b_team[1].get_pos(), field.ball.get_pos()) < 150:
+                    if (self.timer is None):
+                        actions[1] = Actions.CatchBall(field.b_team[1].get_pos(), 0)
+                        self.timer = time()
+                    elif (self.timer + 1 < time()):
+                        self.timer = None
+                        actions[1] = Actions.Kick(field.b_team[2].get_pos(), is_pass = True)
+                    else:
+                        actions[1] = Actions.CatchBall(field.b_team[1].get_pos(), (field.b_team[7].get_pos() - field.b_team[1].get_pos()).arg())
                 else:
-                    actions[1] = Actions.GoToPoint(aux.Point(0,0), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
-            
-            
+                    actions[1] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
+                '''
+                if aux.dist(field.b_team[1].get_pos(), field.ball.get_pos()) < 400:
+                        actions[1] = Actions.Kick(field.b_team[7].get_pos(), is_pass = True)
+                else:
+                    actions[1] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
+                

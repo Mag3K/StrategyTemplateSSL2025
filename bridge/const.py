@@ -12,7 +12,7 @@ class State(Enum):
     TIMEOUT = 1
     STOP = 2
     PREPARE_KICKOFF = 3
-    BALL_PLACEMENT = 4
+    BALL_PLACEMENT = 4 
     PREPARE_PENALTY = 5
     KICKOFF = 6
     FREE_KICK = 7
@@ -50,7 +50,7 @@ DIV = Div.C
 COLOR = Color.BLUE
 POLARITY = 1  # -1 если ворота синих на +x; 1 если ворота синих на -x
 
-IS_SIMULATOR_USED = True
+IS_SIMULATOR_USED = False
 SELF_PLAY = False
 
 DEBUG_HALF = 0  # 1 = +x, -1 = -x, 0 = not debug
