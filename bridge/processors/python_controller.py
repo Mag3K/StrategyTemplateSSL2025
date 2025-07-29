@@ -64,7 +64,7 @@ class SSLController(BaseProcessor):
         """
         new_field = self.field_reader.read_last()
         if new_field is not None:
-            updated_field = new_field.content
+            updated_field: fld.LiteField = new_field.content
             # print(f"strategy daley{(time() - new_field.timestamp)*1000 : .2f}")
             self.field.update_field(updated_field)
         else:

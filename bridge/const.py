@@ -115,7 +115,7 @@ IMAGE_TOPIC = "image-topic"
 Ts = 0.02  # s
 
 # ROBOT SETTING CONSTS
-MAX_SPEED = 2000 if not IS_SIMULATOR_USED else 1000
+MAX_SPEED = 1250 if not IS_SIMULATOR_USED else 1000
 MAX_ACCELERATION = 5000
 MAX_SPEED_R = 30
 SOFT_MAX_SPEED = 500
@@ -133,7 +133,7 @@ GRAVEYARD_POS_X = -10000
 
 BALL_MAX_VISION_SPEED = 10000  # for filter random balls
 ROBOT_MAX_VISION_SPEED = 10000  # for filter random robots
-TIME_TO_BORN = 0.5  # time to add robot to field
+TIME_TO_BORN = 0.1  # time to add robot to field
 TIME_TO_DIE = 0.5  # time to remove robot from field
 
 match DIV:

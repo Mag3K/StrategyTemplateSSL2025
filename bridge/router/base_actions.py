@@ -108,18 +108,17 @@ class Actions:
                     next_point = aux.nearest_point_on_poly(domain.robot.get_pos(), domain.field.enemy_goal.big_hull)
                     return [Actions.GoToPointIgnore(next_point, angle0)]
 
-            pint = aux.segment_poly_intersect(domain.robot.get_pos(), next_point, domain.field.ally_goal.hull)
-            if pint is not None:
-                convex_hull = qh.shortesthull(domain.robot.get_pos(), next_point, domain.field.ally_goal.big_hull)
-                for j in range(len(convex_hull) - 2, 0, -1):
-                    next_point = convex_hull[j]
+                pint = aux.segment_poly_intersect(domain.robot.get_pos(), next_point, domain.field.ally_goal.hull)
+                if pint is not None:
+                    convex_hull = qh.shortesthull(domain.robot.get_pos(), next_point, domain.field.ally_goal.big_hull)
+                    for j in range(len(convex_hull) - 2, 0, -1):
+                        next_point = convex_hull[j]
 
-            pint = aux.segment_poly_intersect(domain.robot.get_pos(), next_point, domain.field.enemy_goal.hull)
-            if pint is not None:
-                convex_hull = qh.shortesthull(domain.robot.get_pos(), next_point, domain.field.enemy_goal.big_hull)
-                for j in range(len(convex_hull) - 2, 0, -1):
-                    domain.field.path_image.draw_circle(convex_hull[j], (150, 0, 150), 100)
-                    next_point = convex_hull[j]
+                pint = aux.segment_poly_intersect(domain.robot.get_pos(), next_point, domain.field.enemy_goal.hull)
+                if pint is not None:
+                    convex_hull = qh.shortesthull(domain.robot.get_pos(), next_point, domain.field.enemy_goal.big_hull)
+                    for j in range(len(convex_hull) - 2, 0, -1):
+                        next_point = convex_hull[j]
 
             avoid_ball = domain.game_state in [GameStates.STOP, GameStates.PREPARE_KICKOFF] or not domain.we_active
             pth_wp = calc_passthrough_wp(domain, next_point, avoid_ball=avoid_ball, ignore_ball=self.ignore_ball)

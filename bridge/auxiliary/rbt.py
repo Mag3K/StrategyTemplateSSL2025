@@ -45,9 +45,6 @@ class Robot(entity.Entity):
 
         # v! SIM
         if const.IS_SIMULATOR_USED:
-            self.k_xx: float = -1000
-            self.k_yy: float = 1000
-            self.k_ww: float = 1
             self.k_wy = -0.001
             self.t_wy = 0.15
             self.r_comp_f_dy = tau.FOD(self.t_wy, const.Ts)
@@ -55,49 +52,28 @@ class Robot(entity.Entity):
 
         # v! REAL
         else:
-            self.k_xx = -1200 / 30
-            self.k_yy = 1100 / 30
-            self.k_ww = 6 / 20
             self.k_wy = 0
             self.t_wy = 0.15
             self.r_comp_f_dy = tau.FOD(self.t_wy, const.Ts)
             self.r_comp_f_fy = tau.FOLP(self.t_wy, const.Ts)
 
-        # self.max_acc = 1000
-        # self.xxRL = tau.RateLimiter(const.Ts, self.max_acc)
-        # self.yyRL = tau.RateLimiter(const.Ts, self.max_acc)
         self.xx_t = 0.1
         self.xx_flp = tau.FOLP(self.xx_t, const.Ts)
         self.yy_t = 0.1
         self.yy_flp = tau.FOLP(self.yy_t, const.Ts)
-        # self.a0TF = 0.5
-        # self.a0Flp = tau.FOLP(self.a0TF, const.Ts)
 
         # !v REAL
-        gains_full = [2.0, 0.1, 0.05, const.MAX_SPEED]
-        # gains_full = [0.3, 0.2, 1, const.MAX_SPEED]
-        gains_soft = [2.0, 0.1, 0.05, const.SOFT_MAX_SPEED]
+        gains_full = [2.5, 0.07, 0.05, const.MAX_SPEED]
+        gains_soft = gains_full
         a_gains_full = [15, 0.5, 0, const.MAX_SPEED_R]
-        # gains_soft = [10, 0.32, 0, const.SOFT_MAX_SPEED]
-        # gains_soft = gains_full
         if const.IS_SIMULATOR_USED:
             # gains_full = [8, 0.35, 0, const.MAX_SPEED]
+            #            Prop  Diff  Int
             gains_full = [1.8, 0.06, 0.0, const.MAX_SPEED]
             gains_soft = gains_full
             a_gains_full = [8, 0.1, 0.1, const.MAX_SPEED_R]
-        # a_gains_soft = [4, 0.07, 8, const.SOFT_MAX_SPEED_R]
-        a_gains_soft = a_gains_full
-        # else:
-        #     gains_full = [6, 0.8, 0, const.MAX_SPEED]
-        #     gains_soft = [6, 1, 0.1, const.SOFT_MAX_SPEED]
-        #     a_gains_full = [6, 0.1, 0, const.MAX_SPEED_R]
-        #     a_gains_soft = [2, 0.07, 1, const.SOFT_MAX_SPEED_R]
 
-        # !v SIM
-        # gains_full = [2, 0.3, 0, const.MAX_SPEED]
-        # gains_soft = [0.5, 0.1, 0, const.SOFT_MAX_SPEED]
-        # a_gains_full = [2, 0.1, 0.1, const.MAX_SPEED_R]
-        # a_gains_soft = [1, 0.07, 0, const.SOFT_MAX_SPEED_R]
+        a_gains_soft = a_gains_full
 
         self.pos_reg_x = tau.PISD(
             const.Ts,
@@ -172,17 +148,17 @@ class Robot(entity.Entity):
         if self.live_time_ is None:
             self.live_time_ = t
 
-    def update_(self, new_entity: "Robot") -> None:
+    def update_(self, lite_robot: "LiteRobot") -> None:
         """
         Обновить состояние робота используя готовые данные
         """
-        self._pos = new_entity.get_pos()
-        self._vel = new_entity.get_vel()
-        self._angle = new_entity.get_angle()
-        self._anglevel = new_entity.get_anglevel()
+        self._pos = lite_robot.pos
+        self._vel = lite_robot.vel
+        self._angle = lite_robot.angle
+        self._anglevel = lite_robot.anglevel
 
-        self._is_used = new_entity.is_used()
-        self.last_update_ = new_entity.last_update()
+        self._is_used = lite_robot.is_used
+        self.last_update_ = lite_robot.is_used
 
     def kick_forward(self) -> None:
         """
@@ -267,8 +243,8 @@ class Robot(entity.Entity):
         global_speed = aux.Point(global_speed_x, global_speed_y)
 
         speed = -aux.rotate(global_speed, -self._angle)
-        self.speed_x = 1 / self.k_xx * speed.x
-        self.speed_y = 1 / self.k_yy * speed.y
+        self.speed_x = -speed.x
+        self.speed_y = speed.y
 
         # if abs(self.speed_r) > const.MAX_SPEED_R:
         #     self.speed_r = math.copysign(const.MAX_SPEED_R, self.speed_r)
@@ -284,7 +260,7 @@ class Robot(entity.Entity):
 
     def update_vel_w(self, wvel: float) -> None:
         """Update robot angle vel"""
-        self.speed_r = 1 / self.k_ww * wvel
+        self.speed_r = wvel
 
     def update_vel_xy_(self, vel: aux.Point, dT: float) -> None:
         """
@@ -299,8 +275,8 @@ class Robot(entity.Entity):
 
         speed = -aux.rotate(global_speed, -self._angle)
 
-        self.speed_x = 1 / self.k_xx * speed.x
-        self.speed_y = 1 / self.k_yy * speed.y
+        self.speed_x = -speed.x
+        self.speed_y = speed.y
 
         # if abs(self.speed_r) > const.MAX_SPEED_R:
         #     self.speed_r = math.copysign(const.MAX_SPEED_R, self.speed_r)
@@ -330,3 +306,18 @@ class Robot(entity.Entity):
             + " "
             + str(self.speed_r)
         )
+
+
+class LiteRobot:
+    """Lite class, to moving information about robot between processes"""
+
+    def __init__(self, robot: Robot) -> None:
+        self.r_id = robot.r_id
+
+        self.pos = robot.get_pos()
+        self.vel = robot.get_vel()
+        self.angle = robot.get_angle()
+        self.anglevel = robot.get_anglevel()
+
+        self.is_used = robot.is_used()
+        self.last_update = robot.last_update()

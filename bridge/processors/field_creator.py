@@ -220,7 +220,8 @@ class FieldCreator(BaseProcessor):
                     self.field.robot_with_ball = r
         self.field.last_update = time()
         self.field.field_image.timer.end(time())
-        self.field_writer.write(self.field)
+        lite_field = fld.LiteField(self.field)
+        self.field_writer.write(lite_field)
 
 
 def filter_fake_detections(

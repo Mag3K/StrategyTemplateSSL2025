@@ -27,6 +27,8 @@ class Drawer(BaseProcessor):
         self.field_reader = DataReader(data_bus, const.FIELD_TOPIC)
         self.image_reader = DataReader(data_bus, const.IMAGE_TOPIC)
 
+        self.field = fld.Field(const.COLOR)
+
         self.images: dict[drawing.ImageTopic, drawing.Image] = {}
         for topic in drawing.ImageTopic:
             self.images.update({topic: drawing.Image(topic)})
@@ -49,14 +51,17 @@ class Drawer(BaseProcessor):
             self.images[image.topic] = image
 
         if message_fld is not None:
-            field: fld.Field = message_fld.content
-            image = field.field_image
+            new_field: fld.LiteField = message_fld.content
+            self.field.update_field(new_field)
+            image = self.field.field_image
             self.images[image.topic] = image
 
         all_data: dict[str, dict[str, Any]] = {}
         telemetries: dict[str, str] = {}
 
         for topic, image in self.images.items():
+            if topic == drawing.ImageTopic.FIELD:
+                continue
             all_data.update(
                 {
                     str(topic.name): {

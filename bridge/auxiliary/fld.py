@@ -210,26 +210,32 @@ class Field:
             robots.append(self.enemies[self.enemy_gk_id])
         return robots
 
-    def update_field(self, new_field: "Field") -> None:
+    def update_field(self, new_field: "LiteField") -> None:
         """update with data from new_field"""
         self.game_state = new_field.game_state
         self.active_team = new_field.active_team
 
-        self.robot_with_ball = new_field.robot_with_ball
+        if new_field.robot_with_ball is None:
+            self.robot_with_ball = None
+        elif new_field.robot_with_ball[0] == const.Color.BLUE:
+            self.robot_with_ball = self.b_team[new_field.robot_with_ball[1]]
+        else:
+            self.robot_with_ball = self.y_team[new_field.robot_with_ball[1]]
+
         self.last_update = new_field.last_update
 
         self.ball = new_field.ball
         self.ball_start_point = new_field.ball_start_point
 
-        if self.ally_color == new_field.ally_color:
-            self.update_active_allies(new_field.active_allies())
-            self.update_active_enemies(new_field.active_enemies())
-        else:
-            self.update_active_allies(new_field.active_enemies())
-            self.update_active_enemies(new_field.active_allies())
+        for robot in self.all_bots:
+            robot.used(0)
+        for lite_robot in new_field.blue_team:
+            self.b_team[lite_robot.r_id].update_(lite_robot)
+        for lite_robot in new_field.yellow_team:
+            self.y_team[lite_robot.r_id].update_(lite_robot)
 
-        for i, robot in enumerate(self.all_bots):
-            robot.update_(new_field.all_bots[i])
+        self.update_active_allies([robot for robot in self.allies if robot.is_used()])
+        self.update_active_enemies([robot for robot in self.enemies if robot.is_used()])
 
     def update_ball(self, pos: aux.Point, t: float) -> None:
         """update ball position"""
@@ -408,3 +414,23 @@ def find_nearest_robots(
     sorted_robots: list[rbt.Robot] = [rbt_dst[0] for rbt_dst in sorted_robot_dist]
 
     return sorted_robots[:num]
+
+
+class LiteField:
+    """Lite class, to moving information about robots and ball between processes"""
+
+    def __init__(self, field: Field) -> None:
+        self.game_state: const.State = field.game_state
+        self.active_team: const.Color = field.active_team
+        self.last_update = field.last_update
+        self.robot_with_ball: Optional[tuple[const.Color, int]]
+        if field.robot_with_ball is None:
+            self.robot_with_ball = None
+        else:
+            self.robot_with_ball = (field.robot_with_ball.color, field.robot_with_ball.r_id)
+
+        self.ball: entity.Entity = field.ball
+        self.ball_start_point: aux.Point = field.ball_start_point
+
+        self.blue_team = [rbt.LiteRobot(robot) for robot in field.b_team if robot.is_used()]
+        self.yellow_team = [rbt.LiteRobot(robot) for robot in field.y_team if robot.is_used()]
