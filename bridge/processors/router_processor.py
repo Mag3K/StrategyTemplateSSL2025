@@ -165,6 +165,8 @@ class CommandSink(BaseProcessor):
 
 def command_from_values(field: fld.Field, robot: rbt.Robot, values: ActionValues) -> "DecoderCommand":
     """Turn ActionValues to commands for robots"""
+    if const.IS_SIMULATOR_USED:
+        robot.beep = 1
 
     if values.beep == 0:
         robot.update_vel_xy(values.vel)
