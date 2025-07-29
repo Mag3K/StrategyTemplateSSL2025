@@ -129,6 +129,16 @@ class Actions:
             if next_point != self.target_pos:
                 return [Actions.GoToPointIgnore(next_point, angle0)]
             return [Actions.GoToPointIgnore(self.target_pos, angle0, self.ball_interact)]
+        
+    class CatchBall(Action):
+        def __init__(self,target_pos: aux.Point, target_angle: float) -> None:
+            self.target_pos = target_pos
+            self.target_angle = target_angle
+
+        def use_behavior_of(self, domain: ActionDomain, current_action: ActionValues) -> list[Action]:
+            current_action.dribbler_speed = 15
+            return [Actions.GoToPoint(self.target_pos, self.target_angle, False, True)]
+
 
     class BallPlacement(Action):
         """Move ball to target_point"""

@@ -14,7 +14,7 @@ class State(Enum):
     TIMEOUT = 1
     STOP = 2
     PREPARE_KICKOFF = 3
-    BALL_PLACEMENT = 4
+    BALL_PLACEMENT = 4 
     PREPARE_PENALTY = 5
     KICKOFF = 6
     FREE_KICK = 7
