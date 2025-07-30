@@ -91,23 +91,24 @@ class Strategy:
 
         if field.ally_color == const.Color.BLUE:
 
-            goal_keeper_id_global = 7
-            attacker1_id_global = 0
-            attacker2_id_global = 1
+            goal_keeper_id_global = const.GK
+            attacker1_id_global = 1
+            attacker2_id_global = 2
             
             #self.Attacker2.checker_b(field)
-            #self.Attacker2.go_b(field, actions)
             #self.Attacker1.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
-            self.GoalKeeper.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
+            #self.GoalKeeper.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
+            actions[0] = Actions.GoToPointIgnore(aux.Point(0, 0), 0)
             #self.Attacker2.kick_b(field, actions)
 
         else:
 
-            goal_keeper_id_global = 5
-            attacker1_id_global = 6
-            attacker2_id_global = 3
+            goal_keeper_id_global = const.ENEMY_GK
+            attacker1_id_global = 1
+            attacker2_id_global = 2
             
-            self.Attacker2.checker_y(field)
-            self.Attacker1.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
-            self.GoalKeeper.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
-            self.Attacker2.kick_y(field, actions)
+            #self.Attacker2.checker_y(field)
+            #self.Attacker1.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
+            #self.GoalKeeper.go(field, actions, attacker1_id = attacker1_id_global, attacker2_id = attacker2_id_global, goal_keeper_id = goal_keeper_id_global)
+            #self.Attacker2.kick_y(field, actions)
+            actions[0] = Actions.GoToPointIgnore(aux.Point(0, 0), 0)

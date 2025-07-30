@@ -148,7 +148,7 @@ class Attacker1:
                 if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
-                    actions[1] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
+                    actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
 
             elif self.attack == 3:
                 for i in range(0, 10):
