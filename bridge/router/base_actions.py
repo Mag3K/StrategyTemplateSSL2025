@@ -508,14 +508,15 @@ def calc_passthrough_wp(
 
     obstacles_dist: list[tuple[Entity, float]] = []
 
-    if not ignore_ball:
+    if avoid_ball:
+        ball = Entity(
+            field.ball.get_pos(),
+            field.ball.get_angle(),
+            const.KEEP_BALL_DIST - const.ROBOT_R,
+        )
+        obstacles_dist.append((ball, aux.dist(ball.get_pos(), robot.get_pos())))
+    elif not ignore_ball:
         ball = field.ball
-        if avoid_ball:
-            ball = Entity(
-                field.ball.get_pos(),
-                field.ball.get_angle(),
-                const.KEEP_BALL_DIST - const.ROBOT_R,
-            )
 
         if (
             len(aux.line_circle_intersect(robot.get_pos(), target, ball.get_pos(), const.ROBOT_R + ball.get_radius(), "S"))

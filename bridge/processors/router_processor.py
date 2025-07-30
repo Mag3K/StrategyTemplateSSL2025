@@ -100,21 +100,33 @@ class CommandSink(BaseProcessor):
                 team_commands: list[DecoderCommand] = []
                 for i in range(const.TEAM_ROBOTS_MAX_COUNT):
                     cur_action = self.actions[color][i]
-                    if self.field[color].allies[i].is_used() and cur_action is not None:
-                        self.field[color].allies[i].clear_fields()
+                    domain = ActionDomain(
+                        field=self.field[color],
+                        game_state=self.field[color].game_state,
+                        we_active=self.field[color].active_team in [const.Color.ALL, color],
+                        robot=self.field[color].allies[i],
+                    )
+                    if cur_action is not None:
+                        if self.field[color].allies[i].is_used():
+                            self.field[color].allies[i].clear_fields()
 
-                        domain = ActionDomain(
-                            field=self.field[color],
-                            game_state=self.field[color].game_state,
-                            we_active=self.field[color].active_team in [const.Color.ALL, color],
-                            robot=self.field[color].allies[i],
-                        )
-                        values = ActionValues()
-                        cur_action.process(domain, values)
+                            domain = ActionDomain(
+                                field=self.field[color],
+                                game_state=self.field[color].game_state,
+                                we_active=self.field[color].active_team in [const.Color.ALL, color],
+                                robot=self.field[color].allies[i],
+                            )
+                            values = ActionValues()
+                            cur_action.process(domain, values)
 
-                        cur_command = command_from_values(domain.field, domain.robot, values)
-                        team_commands.append(cur_command)
-                        team_message += create_telemetry(cur_command)
+                            cur_command = command_from_values(domain.field, domain.robot, values)
+                            team_commands.append(cur_command)
+                            team_message += create_telemetry(cur_command)
+                        elif time() - self.field[color].allies[i].last_update() > const.TIME_TO_DIE:
+                            cur_command = stop_command(i)
+                            team_commands.append(cur_command)
+                            team_message += create_telemetry(cur_command)
+                            self.actions[color][i] = None
 
                 if len(team_commands) > 0:
                     control_data = DecoderTeamCommand(
@@ -246,6 +258,10 @@ class DecoderCommand:
 test_commands = [
     DecoderCommand(idx, True, False, False, False, 15, 15, 100, 0, 1, None) for idx in range(const.TEAM_ROBOTS_MAX_COUNT)
 ]
+
+
+def stop_command(idx: int) -> DecoderCommand:
+    return DecoderCommand(idx, False, False, False, False, 0, 0, 0, 0, 0, None)
 
 
 @attrs.define
