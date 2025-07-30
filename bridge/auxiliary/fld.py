@@ -234,8 +234,8 @@ class Field:
         for lite_robot in new_field.yellow_team:
             self.y_team[lite_robot.r_id].update_(lite_robot)
 
-        self.update_active_allies([robot for robot in self.allies if robot.is_used()])
-        self.update_active_enemies([robot for robot in self.enemies if robot.is_used()])
+        self.update_active_allies([robot for robot in self.allies if (robot.is_used() and robot.r_id != self.gk_id)])
+        self.update_active_enemies([robot for robot in self.enemies if (robot.is_used() and robot.r_id != self.enemy_gk_id)])
 
     def update_ball(self, pos: aux.Point, t: float) -> None:
         """update ball position"""
@@ -432,7 +432,5 @@ class LiteField:
         self.ball: entity.Entity = field.ball
         self.ball_start_point: aux.Point = field.ball_start_point
 
-        self.blue_team = [rbt.LiteRobot(robot) for robot in field.b_team if (robot.is_used() and robot.r_id != field.gk_id)]
-        self.yellow_team = [
-            rbt.LiteRobot(robot) for robot in field.y_team if (robot.is_used() and robot.r_id != field.enemy_gk_id)
-        ]
+        self.blue_team = [rbt.LiteRobot(robot) for robot in field.b_team if robot.is_used()]
+        self.yellow_team = [rbt.LiteRobot(robot) for robot in field.y_team if robot.is_used()]
