@@ -149,6 +149,7 @@ GRAVEYARD_POS = Point(0, const.GRAVEYARD_POS_X)
 FIELD_INF = Point(const.GRAVEYARD_POS_X, 0)
 
 
+
 def dist2line(line_start: Point, line_end: Point, point: Point) -> float:
     """
     Calculate the distance from a point to the line formed by two other points.
