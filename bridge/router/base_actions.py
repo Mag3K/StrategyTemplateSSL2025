@@ -343,7 +343,7 @@ class DumbActions:
 
 def get_pass_voltage(length: float) -> int:
     """Calc voltage for pass by length"""
-    return int(aux.minmax(0.0031 * length + 2.7, 5, const.VOLTAGE_SHOOT))
+    return int(aux.minmax(0.0029 * length + 2.7, 5, const.VOLTAGE_SHOOT))
 
 
 def get_grab_speed(
