@@ -18,6 +18,10 @@ class Attacker1:
         if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
             ATTACKER_A = aux.Point(0, 0)
             ATTACKER_A_DIST = 5000.0
+            baseAngle = 3.14
+            attacker1_pos = field.y_team[attacker1_id].get_pos()
+            attacker2_pos = field.y_team[attacker2_id].get_pos()
+            goal_keeper_pos = field.y_team[goal_keeper_id].get_pos()
             for i in range(0, 10):
                 if aux.dist(field.b_team[i].get_pos(), field.ball.get_pos()) < ATTACKER_A_DIST:
                     ATTACKER_A_DIST = aux.dist(field.b_team[i].get_pos(), field.ball.get_pos())
@@ -46,48 +50,30 @@ class Attacker1:
                 self.attack = 0   
             if ATTACKER_A_DIST < 300:
                 self.attack = 0  
-            #if ATTACKER_A_DIST < aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) and aux.dist(field.b_team[attacker2_id].get_pos(), field.ball.get_pos()) > 500 and aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) > 300 and aux.dist(field.b_team[goal_keeper_id].get_pos(), field.ball.get_pos()) > 1000:
-            #    self.attack = 2  
-            if aux.dist(field.y_team[attacker1_id].get_pos(), field.ball.get_pos()) < 300 and ((field.y_team[attacker1_id].get_pos()).x > 1 * field.polarity):
+            if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and (attacker1_pos).x > 1 * field.polarity and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50:
                 self.attack = 3  
+            if aux.dist(ATTACKER_A, Point51) > 1000 and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50:
+                self.attack = 3  
+            if aux.dist(attacker2_pos, Point51) < 300:
+                self.attack = 0 
 
             if self.attack == 0:
                 field.strategy_image.draw_circle(field.y_team[1].get_pos(), (255, 255, 255), 150)
                 if aux.dist(Point22, Point41) > aux.dist(Point22, Point42):
-                    actions[attacker1_id] = Actions.GoToPoint(Point42, 3.14)
+                    actions[attacker1_id] = Actions.GoToPoint(Point42, baseAngle)
                 else:
-                    actions[attacker1_id] = Actions.GoToPoint(Point41, 3.14)
+                    actions[attacker1_id] = Actions.GoToPoint(Point41, baseAngle)
                 if  ATTACKER_A == aux.Point(0, 0):
-                    actions[attacker1_id] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), 3.14)
+                    actions[attacker1_id] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), baseAngle)
 
             elif self.attack == 1:
-                #actions[1] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), field.b_team[attacker1_id].get_angle())
                 
-                field.strategy_image.draw_circle(field.y_team[attacker1_id].get_pos(), (255, 0, 0), 130)
-                if aux.dist(field.y_team[attacker1_id].get_pos(), field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
-                    actions[attacker1_id] = Actions.Kick(field.y_team[attacker2_id].get_pos(), is_pass = True)
-                    #if (self.timer is None):
-                    #    actions[attacker1_id] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), 0)
-                    #    self.timer = time()
-                    #elif (self.timer + 1 < time()):
-                    #    self.timer = None
-                    #    actions[attacker1_id] = Actions.Kick(field.b_team[2].get_pos(), is_pass = True)
-                    #else:
-                    #    actions[attacker1_id] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), (field.b_team[attacker2_id].get_pos() - field.b_team[attacker1_id].get_pos()).arg())
+                field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
+                if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
+                    actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
-                    actions[1] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.y_team[goal_keeper_id].get_pos() - field.y_team[attacker1_id].get_pos()).arg())
-                '''
-                field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 0, 0), 130)
-                if aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) < 400:
-                        actions[attacker1_id] = Actions.Kick(field.b_team[attacker2_id].get_pos(), is_pass = True)
-                else:
-                    actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[goal_keeper_id].get_pos() - field.b_team[attacker1_id].get_pos()).arg())
-                '''
-                     
-            #elif self.attack == 2:
-            #    field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 0, 255), 150)
-            #    actions[attacker1_id] = Actions.Kick(field.b_team[goal_keeper_id].get_pos(), is_pass = True)
-            
+                    field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, -800 * field.polarity), (0, 0, 0), 20)
+                    actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
 
             elif self.attack == 3:
                 for i in range(0, 10):
@@ -108,6 +94,10 @@ class Attacker1:
         else:  #--------------------------------------------------BLUE--------------------------------------------------
             ATTACKER_A = aux.Point(0, 0)
             ATTACKER_A_DIST = 5000.0
+            baseAngle = 0
+            attacker1_pos = field.b_team[attacker1_id].get_pos()
+            attacker2_pos = field.b_team[attacker2_id].get_pos()
+            goal_keeper_pos = field.b_team[goal_keeper_id].get_pos()
             for i in range(0, 10):
                 if aux.dist(field.y_team[i].get_pos(), field.ball.get_pos()) < ATTACKER_A_DIST:
                     ATTACKER_A_DIST = aux.dist(field.y_team[i].get_pos(), field.ball.get_pos())
@@ -136,48 +126,29 @@ class Attacker1:
                 self.attack = 0   
             if ATTACKER_A_DIST < 300:
                 self.attack = 0  
-            #if ATTACKER_A_DIST < aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) and aux.dist(field.b_team[attacker2_id].get_pos(), field.ball.get_pos()) > 500 and aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) > 300 and aux.dist(field.b_team[goal_keeper_id].get_pos(), field.ball.get_pos()) > 1000:
-            #    self.attack = 2  
-            if aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) < 300 and ((field.b_team[attacker1_id].get_pos()).x > 1 * field.polarity):
+            if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and ((attacker1_pos).x > 1 * field.polarity and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50):
                 self.attack = 3  
+            if aux.dist(ATTACKER_A, Point51) > 1000 and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50:
+                self.attack = 3  
+            if aux.dist(attacker2_pos, Point51) < 300:
+                self.attack = 0 
 
             if self.attack == 0:
                 field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 255, 255), 150)
                 if aux.dist(Point22, Point41) > aux.dist(Point22, Point42):
-                    actions[attacker1_id] = Actions.GoToPoint(Point42, 0)
+                    actions[attacker1_id] = Actions.GoToPoint(Point42, baseAngle)
                 else:
-                    actions[attacker1_id] = Actions.GoToPoint(Point41, 0)
+                    actions[attacker1_id] = Actions.GoToPoint(Point41, baseAngle)
                 if  ATTACKER_A == aux.Point(0, 0):
-                    actions[attacker1_id] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), 0)
+                    actions[attacker1_id] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), baseAngle)
 
             elif self.attack == 1:
-                #actions[1] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), field.b_team[attacker1_id].get_angle())
                 
-                field.strategy_image.draw_circle(field.b_team[attacker1_id].get_pos(), (255, 0, 0), 130)
-                if aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
-                    actions[attacker1_id] = Actions.Kick(field.b_team[attacker2_id].get_pos(), is_pass = True)
-                    #if (self.timer is None):
-                    #    actions[attacker1_id] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), 0)
-                    #    self.timer = time()
-                    #elif (self.timer + 1 < time()):
-                    #    self.timer = None
-                    #    actions[attacker1_id] = Actions.Kick(field.b_team[2].get_pos(), is_pass = True)
-                    #else:
-                    #    actions[attacker1_id] = Actions.CatchBall(field.b_team[attacker1_id].get_pos(), (field.b_team[attacker2_id].get_pos() - field.b_team[attacker1_id].get_pos()).arg())
+                field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
+                if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
+                    actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
                     actions[1] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[0].get_pos() - field.b_team[1].get_pos()).arg())
-                '''
-                field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 0, 0), 130)
-                if aux.dist(field.b_team[attacker1_id].get_pos(), field.ball.get_pos()) < 400:
-                        actions[attacker1_id] = Actions.Kick(field.b_team[attacker2_id].get_pos(), is_pass = True)
-                else:
-                    actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (field.b_team[goal_keeper_id].get_pos() - field.b_team[attacker1_id].get_pos()).arg())
-                '''
-                     
-            #elif self.attack == 2:
-            #    field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 0, 255), 150)
-            #    actions[attacker1_id] = Actions.Kick(field.b_team[goal_keeper_id].get_pos(), is_pass = True)
-            
 
             elif self.attack == 3:
                 for i in range(0, 10):
