@@ -25,8 +25,8 @@ class Strategy:
         self.Attacker1 = Attacker1()
         self.GoalKeeper = GoalKeeper()
         self.Attacker2 = Attacker2()
-        self.attacker1_id_global = 1
-        self.attacker2_id_global = 2
+        self.attacker1_id_global = 2
+        self.attacker2_id_global = 7
 
     def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
@@ -50,7 +50,10 @@ class Strategy:
             case GameStates.TIMEOUT:
                 pass
             case GameStates.HALT:
-                return [None] * const.TEAM_ROBOTS_MAX_COUNT
+                actions[const.GK] = Actions.Stop()
+                actions[self.attacker1_id_global] = Actions.Stop()
+                actions[self.attacker2_id_global] = Actions.Stop()
+                return [Actions.Stop()] * const.TEAM_ROBOTS_MAX_COUNT
             case GameStates.PREPARE_PENALTY:
                 if self.we_active == True:
                     if field.ally_color == const.Color.BLUE:
@@ -85,12 +88,12 @@ class Strategy:
                 if self.we_active == False:
                     if field.ally_color == const.Color.YELLOW:
                         self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-                        actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((800)*field.polarity, 0), (field.ball.get_pos() - field.y_team[self.attacker1_id_global].get_pos()).arg())
-                        actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(2000*field.polarity, 0), (field.ball.get_pos() - field.y_team[self.attacker2_id_global].get_pos()).arg())
+                        actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((800)*field.polarity, 0), (field.ball.get_pos() - field.y_team[self.attacker2_id_global].get_pos()).arg())
+                        actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(2000*field.polarity, 0), (field.ball.get_pos() - field.y_team[self.attacker1_id_global].get_pos()).arg())
                     else:
                         self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-                        actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((800)*field.polarity, 0), (field.ball.get_pos() - field.b_team[self.attacker1_id_global].get_pos()).arg())
-                        actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(2000*field.polarity, 0), (field.ball.get_pos() - field.b_team[self.attacker2_id_global].get_pos()).arg())
+                        actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((800)*field.polarity, 0), (field.ball.get_pos() - field.b_team[self.attacker2_id_global].get_pos()).arg())
+                        actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(2000*field.polarity, 0), (field.ball.get_pos() - field.b_team[self.attacker1_id_global].get_pos()).arg())
 
                 else:
                     if field.ally_color == const.Color.BLUE:
@@ -104,8 +107,8 @@ class Strategy:
             case GameStates.KICKOFF:
                 if self.we_active == False:
                     self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-                    actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((-400)*field.polarity, 0), 0)
-                    actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(-1000*field.polarity, 0), 0)
+                    actions[self.attacker2_id_global] = Actions.GoToPoint(aux.Point((400)*field.polarity, 0), 0)
+                    actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(1000*field.polarity, 0), 0)
                 else:
                     self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
                     actions[self.attacker1_id_global] = Actions.GoToPoint(aux.Point(-1000*field.polarity,0),0)
@@ -194,9 +197,11 @@ class Strategy:
             self.Attacker1.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
             self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
             self.Attacker2.kick_b(field, actions)
+            
 
         else:
-            self.Attacker2.checker_y(field)
-            self.Attacker1.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
+            #self.Attacker2.checker_y(field)
+            #self.Attacker1.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
             self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-            self.Attacker2.kick_y(field, actions)
+            #self.Attacker2.kick_y(field, actions)
+            pass
