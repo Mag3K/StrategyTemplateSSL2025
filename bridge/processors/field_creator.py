@@ -133,11 +133,6 @@ class FieldCreator(BaseProcessor):
                     ally = self.field.robot_with_ball
                     ball = ally.get_pos() + aux.rotate(aux.RIGHT, ally.get_angle()) * 90
                     self.field.update_ball(ball, time())
-            else:
-                if self.field.robot_with_ball is not None:
-                    ally = self.field.robot_with_ball
-                    ball = ally.get_pos() + aux.rotate(aux.RIGHT, ally.get_angle()) * 90
-                    self.field.update_ball(ball, time())
 
         self.field.update_ball_history()
 
