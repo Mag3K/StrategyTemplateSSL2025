@@ -58,6 +58,8 @@ class Attacker1:
                 self.attack = 2 
             if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
                 self.attack = 1
+            if ATTACKER_A_DIST < 300 and Point51.x > 0:
+                self.attack = 0  
 
             if self.attack == 0:
                 field.strategy_image.draw_circle(field.y_team[1].get_pos(), (255, 255, 255), 150)
@@ -139,6 +141,8 @@ class Attacker1:
                 self.attack = 2 
             if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
                 self.attack = 1
+            if ATTACKER_A_DIST < 300 and Point51.x < 0:
+                self.attack = 0  
 
             if self.attack == 0:
                 field.strategy_image.draw_circle(field.b_team[1].get_pos(), (255, 255, 255), 150)

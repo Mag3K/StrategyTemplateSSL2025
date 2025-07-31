@@ -47,16 +47,16 @@ class Div(Enum):
 ##################################################
 # GAME SETTING CONSTS
 DIV = Div.C
-COLOR = Color.YELLOW
+COLOR = Color.BLUE
 POLARITY = 1  # -1 если ворота синих на +x; 1 если ворота синих на -x
 
-IS_SIMULATOR_USED = True
+IS_SIMULATOR_USED = False
 SELF_PLAY = False
 
 DEBUG_HALF = 0  # 1 = +x, -1 = -x, 0 = not debug
 
 GK = 0
-ENEMY_GK = 0
+ENEMY_GK = 3
 
 ROBOTS_MAX_COUNT: int = 32
 TEAM_ROBOTS_MAX_COUNT: int = ROBOTS_MAX_COUNT // 2
