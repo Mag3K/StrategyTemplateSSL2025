@@ -15,7 +15,7 @@ class Attacker2:
         self.attacker1 = 1
 
     def kick_b(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
-            if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos():
+            if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos() or aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(2250*field.polarity, 450), aux.Point(2250*field.polarity, -450), aux.Point(1700*field.polarity, -450), aux.Point(1700*field.polarity, 450)]) == field.ball.get_pos():
                 actions[self.attacker2] = Actions.GoToPoint(aux.Point(-1100*field.polarity,-800*field.polarity), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
             else:
                 if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
