@@ -28,7 +28,7 @@ class Strategy:
         self.attacker1_id_global = 1
         self.attacker2_id_global = 2
 
-    def process(self, goal: fld.Goal, field: fld.Field) -> list[Optional[Action]]:
+    def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
         if field.game_state not in [GameStates.KICKOFF, GameStates.PENALTY]:
             if field.active_team in [const.Color.ALL, field.ally_color]:
