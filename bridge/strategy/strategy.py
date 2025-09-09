@@ -25,10 +25,10 @@ class Strategy:
         self.Attacker1 = Attacker1()
         self.GoalKeeper = GoalKeeper()
         self.Attacker2 = Attacker2()
-        self.attacker1_id_global = 2
-        self.attacker2_id_global = 1
+        self.attacker1_id_global = 1
+        self.attacker2_id_global = 2
 
-    def process(self, field: fld.Field) -> list[Optional[Action]]:
+    def process(self, goal: fld.Goal, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
         if field.game_state not in [GameStates.KICKOFF, GameStates.PENALTY]:
             if field.active_team in [const.Color.ALL, field.ally_color]:
@@ -78,9 +78,9 @@ class Strategy:
             case GameStates.PENALTY:
                 if self.we_active == True:
                     if field.ally_color == const.Color.BLUE:
-                        actions[self.attacker2_id_global] = Actions.Kick(field.enemy_goal.up - aux.Point(0, 75))
+                        actions[self.attacker2_id_global] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -75*field.polarity))
                     else:
-                        actions[self.attacker2_id_global] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -75))
+                        actions[self.attacker2_id_global] = Actions.Kick(field.enemy_goal.up - aux.Point(0, 75*field.polarity))
                 else:
                     self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
                 

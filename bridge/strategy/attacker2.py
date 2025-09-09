@@ -11,8 +11,8 @@ from bridge.router.base_actions import Action, Actions, KickActions  # type: ign
 class Attacker2:
     def __init__(self) -> None:
         self.GK = aux.Point(0,0)
-        self.attacker2 = 1
-        self.attacker1 = 2
+        self.attacker2 = 2
+        self.attacker1 = 1
 
     def kick_b(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
             if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos():
