@@ -201,8 +201,8 @@ class Strategy:
             
 
         else:
-            #self.Attacker2.checker_y(field)
-            #self.Attacker1.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-            #self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
-            #self.Attacker2.kick_y(field, actions)
+            self.Attacker2.checker_y(field)
+            self.Attacker1.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
+            self.GoalKeeper.go(field, actions, attacker1_id = self.attacker1_id_global, attacker2_id = self.attacker2_id_global, goal_keeper_id = const.GK)
+            self.Attacker2.kick_y(field, actions)
             pass
