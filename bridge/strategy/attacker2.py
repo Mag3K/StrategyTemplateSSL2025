@@ -17,7 +17,7 @@ class Attacker2:
 
     def kick_b(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
             for i in range(0,16):
-                if aux.is_point_on_line(field.y_team[i].get_pos(), field.b_team[self.attacker2], field.b_team[const.GK].get_pos()):
+                if aux.is_point_on_line(field.y_team[i].get_pos(), field.b_team[self.attacker2].get_pos(), field.b_team[const.GK].get_pos()):
                     self.a += 1
             if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos():
                 actions[self.attacker2] = Actions.GoToPoint(aux.Point(0,0), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
@@ -25,7 +25,7 @@ class Attacker2:
                     actions[self.attacker2] = Actions.GoToPoint(aux.Point(0,0), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
                 elif self.a >= 1:
                     actions[self.attacker2] = Actions.CatchBall(aux.Point(-1000* field.polarity, -800), (field.b_team[const.GK].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
-                    if aux.dist(field.b_team[self.attacker2], field.ball.get_pos()) < 300  and aux.nearest_point_in_poly(field.ball.get_pos(), field.ally_goal.hull) != field.ball.get_pos():
+                    if aux.dist(field.b_team[self.attacker2].get_pos(), field.ball.get_pos()) < 300  and aux.nearest_point_in_poly(field.ball.get_pos(), field.ally_goal.hull) != field.ball.get_pos():
                         actions[self.attacker2] = Actions.Kick(field.b_team[self.attacker1].get_pos(), is_pass=True)
             elif aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                 actions[self.attacker2] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
@@ -47,7 +47,7 @@ class Attacker2:
 
     def kick_y(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
         for i in range(0,16):
-                if aux.is_point_on_line(field.y_team[i].get_pos(), field.b_team[self.attacker2], field.b_team[const.GK].get_pos()):
+                if aux.is_point_on_line(field.y_team[i].get_pos(), field.b_team[self.attacker2].get_pos(), field.b_team[const.GK].get_pos()):
                     self.a += 1
         if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos():
                 actions[self.attacker2] = Actions.GoToPoint(aux.Point(0,0), (field.y_team[self.attacker1].get_pos() - field.y_team[self.attacker2].get_pos()).arg())
@@ -55,7 +55,7 @@ class Attacker2:
                     actions[self.attacker2] = Actions.GoToPoint(aux.Point(0,0), (field.y_team[self.attacker1].get_pos() - field.y_team[self.attacker2].get_pos()).arg())
                 elif self.a >= 1:
                     actions[self.attacker2] = Actions.CatchBall(aux.Point(-1000* field.polarity, -800), (field.y_team[const.GK].get_pos() - field.y_team[self.attacker2].get_pos()).arg())
-                    if aux.dist(field.y_team[self.attacker2], field.ball.get_pos()) < 300  and aux.nearest_point_in_poly(field.ball.get_pos(), field.ally_goal.hull) != field.ball.get_pos():
+                    if aux.dist(field.y_team[self.attacker2].get_pos(), field.ball.get_pos()) < 300  and aux.nearest_point_in_poly(field.ball.get_pos(), field.ally_goal.hull) != field.ball.get_pos():
                         actions[self.attacker2] = Actions.Kick(field.y_team[self.attacker1].get_pos(), is_pass=True)
         elif aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
             actions[self.attacker2] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
