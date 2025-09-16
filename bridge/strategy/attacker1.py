@@ -75,7 +75,7 @@ class Attacker1:
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
                 
                 actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
-                if aux.is_point_on_line(field.active_enemies[], goal_keeper_pos, attacker1_pos):
+                if aux.is_point_on_line(field.active_enemies, goal_keeper_pos, attacker1_pos):
                     if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                         if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                             actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
@@ -170,7 +170,7 @@ class Attacker1:
             elif self.attack == 1:
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
                 
-                if aux.is_point_on_line(field.active_enemies[], goal_keeper_pos, attacker1_pos):
+                if aux.is_point_on_line(field.active_enemies, goal_keeper_pos, attacker1_pos):
                     if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                         if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                             actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
@@ -185,7 +185,7 @@ class Attacker1:
                     else:
                         field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, 800 * field.polarity), (0, 0, 0), 20)
                         actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
-                        
+
             elif self.attack == 3:
                 for i in range(0, 10):
                     if aux.nearest_point_in_poly(field.y_team[i].get_pos(), field.enemy_goal.hull) == field.y_team[i].get_pos():
