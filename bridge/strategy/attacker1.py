@@ -8,11 +8,14 @@ from bridge.const import State as GameStates
 from bridge.router.base_actions import Action, Actions, KickActions  # type: ignore
 
 class Attacker1:
+
+
     def __init__(self) -> None:
         self.Point52 = aux.Point(0, 0)
         self.GK = aux.Point(0, 0)
         self.attack = 0
         self.timer: Optional[float] = None
+        self.a = 0
 
     def go(self, field: fld.Field, actions: list[Optional[Action]], attacker1_id: int, attacker2_id: int, goal_keeper_id: int) -> None:
         if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
@@ -75,7 +78,10 @@ class Attacker1:
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
                 
                 actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
-                if aux.is_point_on_line(field.active_enemies, goal_keeper_pos, attacker1_pos):
+                for i in range(0,16):
+                    if aux.is_point_on_line(field.b_team[i].get_pos(), goal_keeper_pos, attacker1_pos):
+                        self.a+=1
+                if self.a >= 1:
                     if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                         if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                             actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
@@ -90,6 +96,7 @@ class Attacker1:
                     else:
                         field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, 800 * field.polarity), (0, 0, 0), 20)
                         actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+                self.a = 0
 
 
             elif self.attack == 3:
@@ -170,7 +177,11 @@ class Attacker1:
             elif self.attack == 1:
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
                 
-                if aux.is_point_on_line(field.active_enemies, goal_keeper_pos, attacker1_pos):
+                actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+                for i in range(0,16):
+                    if aux.is_point_on_line(field.y_team[i].get_pos(), goal_keeper_pos, attacker1_pos):
+                        self.a+=1
+                if self.a >= 1:
                     if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                         if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                             actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
@@ -185,6 +196,7 @@ class Attacker1:
                     else:
                         field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, 800 * field.polarity), (0, 0, 0), 20)
                         actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+                self.a = 0
 
             elif self.attack == 3:
                 for i in range(0, 10):
