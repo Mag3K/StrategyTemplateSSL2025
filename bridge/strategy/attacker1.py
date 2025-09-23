@@ -15,9 +15,11 @@ class Attacker1:
         self.GK = aux.Point(0, 0)
         self.attack = 0
         self.timer: Optional[float] = None
+        self.flag = False
 
     def go(self, field: fld.Field, actions: list[Optional[Action]], attacker1_id: int, attacker2_id: int, goal_keeper_id: int) -> None:
         if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
+
             ATTACKER_A = aux.Point(0, 0)
             ATTACKER_A_DIST = 5000.0
             baseAngle = 3.14
@@ -28,7 +30,14 @@ class Attacker1:
                 if aux.dist(field.b_team[i].get_pos(), field.ball.get_pos()) < ATTACKER_A_DIST:
                     ATTACKER_A_DIST = aux.dist(field.b_team[i].get_pos(), field.ball.get_pos())
                     ATTACKER_A = field.b_team[i].get_pos()
-
+            
+            Point51 = field.ball.get_pos()
+            """
+            for i in field.active_enemies(False):
+                if aux.dist(i.get_pos(), aux.closest_point_on_line(Point51, attacker1_pos, i.get_pos(), "L")) < 100:
+                    self.flag = True
+                    break
+            """
             Point11 = ATTACKER_A
             field.strategy_image.draw_circle(Point11, (0, 255, 0), 130)
             Point12 = field.ball.get_pos()
@@ -44,7 +53,6 @@ class Attacker1:
             Point41 = aux.closest_point_on_line(Point11, Point31, Point22, "R")
             Point42 = aux.closest_point_on_line(Point11, Point32, Point22, "R")
 
-            Point51 = field.ball.get_pos()
 
 
             if aux.nearest_point_in_poly(Point51, field.enemy_goal.hull) == Point51:
@@ -139,6 +147,7 @@ class Attacker1:
 
             Point51 = field.ball.get_pos()
 
+            
 
             if aux.nearest_point_in_poly(Point51, field.enemy_goal.hull) == Point51:
                 self.attack = 0   
@@ -154,8 +163,11 @@ class Attacker1:
                 self.attack = 2 
             if ATTACKER_A_DIST < 300 and Point51.x > 0:
                 self.attack = 0  
-            if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
+            if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51: #and self.flag == False
                 self.attack = 1
+            if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51: #and self.flag == True
+                self.attack = 5
+
 
             
 
@@ -174,6 +186,7 @@ class Attacker1:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
                     actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+                self.flag = False
 
 
             elif self.attack == 3:
@@ -188,7 +201,7 @@ class Attacker1:
                     actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -150 * field.polarity))
 
             elif self.attack == 4:
-                field.strategy_image.draw_circle(field.b_team[1].get_pos(), (127, 0, 127), 150)
+                field.strategy_image.draw_circle(attacker1_pos, (127, 0, 127), 150)
                 actions[attacker1_id] = Actions.GoToPoint(aux.Point(0, 0), baseAngle)
 
             elif self.attack == 5:
@@ -196,3 +209,4 @@ class Attacker1:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
                     actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+                self.flag = False
