@@ -63,7 +63,7 @@ class Attacker1:
                 self.attack = 3  
             if aux.dist(ATTACKER_A, Point51) > 1000 and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50:
                 self.attack = 3  
-            if aux.dist(attacker2_pos, Point51) < 300:
+            if aux.dist(attacker2_pos, Point51) < 300 and aux.nearest_point_in_poly(Point51, [aux.Point(0,0), aux.Point(0,const.GOAL_DY), aux.Point(const.GOAL_DX, const.GOAL_DY), aux.Point(const.GOAL_DX, 0)]) == Point51:   
                 self.attack = 4 
             if aux.dist(attacker1_pos, Point51) < 150:
                 self.attack = 2 
