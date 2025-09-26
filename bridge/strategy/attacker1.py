@@ -71,6 +71,9 @@ class Attacker1:
                 self.attack = 0  
             if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
                 self.attack = 1
+            if aux.dist(attacker2_pos, Point51) < 300 and aux.nearest_point_in_poly(Point51, [aux.Point(0,0), aux.Point(0,-const.GOAL_DY), aux.Point(const.GOAL_DX, -const.GOAL_DY), aux.Point(const.GOAL_DX, 0)]) == Point51:   
+                self.attack = 6
+
             
 
             if self.attack == 0:
@@ -112,6 +115,10 @@ class Attacker1:
                 else:
                     field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, 800 * field.polarity), (0, 0, 0), 20)
                     actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
+            
+            elif self.attack == 6:
+                actions[attacker1_id] = Actions.GoToPoint(aux.Point(1000, 300), baseAngle)
+
 
 
 
@@ -157,7 +164,7 @@ class Attacker1:
                 self.attack = 3  
             if aux.dist(ATTACKER_A, Point51) > 1000 and aux.dist(attacker2_pos, aux.Point(-1100 * field.polarity, -800 * field.polarity)) > 50:
                 self.attack = 3  
-            if aux.dist(attacker2_pos, Point51) < 300:
+            if aux.dist(attacker2_pos, Point51) < 300 and aux.nearest_point_in_poly(Point51, [aux.Point(0,0), aux.Point(0,const.GOAL_DY), aux.Point(const.GOAL_DX, const.GOAL_DY), aux.Point(const.GOAL_DX, 0)]) == Point51:   
                 self.attack = 4 
             if aux.dist(attacker1_pos, Point51) < 150:
                 self.attack = 2 
@@ -167,6 +174,8 @@ class Attacker1:
                 self.attack = 1
             if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51: #and self.flag == True
                 self.attack = 5
+            if aux.dist(attacker2_pos, Point51) < 300 and aux.nearest_point_in_poly(Point51, [aux.Point(0,0), aux.Point(0,-const.GOAL_DY), aux.Point(const.GOAL_DX, -const.GOAL_DY), aux.Point(const.GOAL_DX, 0)]) == Point51:   
+                self.attack = 6
 
 
             
@@ -202,7 +211,7 @@ class Attacker1:
 
             elif self.attack == 4:
                 field.strategy_image.draw_circle(attacker1_pos, (127, 0, 127), 150)
-                actions[attacker1_id] = Actions.GoToPoint(aux.Point(0, 0), baseAngle)
+                actions[attacker1_id] = Actions.GoToPoint(aux.Point(1000, -300), baseAngle)
 
             elif self.attack == 5:
                 if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
@@ -210,3 +219,6 @@ class Attacker1:
                 else:
                     actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, 800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
                 self.flag = False
+
+            elif self.attack == 6:
+                actions[attacker1_id] = Actions.GoToPoint(aux.Point(1000, 300), baseAngle)
