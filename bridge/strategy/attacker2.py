@@ -11,7 +11,7 @@ from bridge.router.base_actions import Action, Actions, KickActions  # type: ign
 class Attacker2:
     def __init__(self) -> None:
         self.GK = aux.Point(0,0)
-        self.attacker2 = 2
+        self.attacker2 = 0
         self.attacker1 = 1
         self.a = 0
 
