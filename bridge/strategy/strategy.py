@@ -26,7 +26,7 @@ class Strategy:
         self.GoalKeeper = GoalKeeper()
         self.Attacker2 = Attacker2()
         self.attacker1_id_global = 1
-        self.attacker2_id_global = 0
+        self.attacker2_id_global = 2
 
     def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""

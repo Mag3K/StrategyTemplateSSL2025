@@ -8,8 +8,12 @@ from bridge.auxiliary import aux, fld, rbt  # type: ignore
 from bridge.const import State as GameStates
 from bridge.router.base_actions import Action, Actions, KickActions  # type: ignore
 
-class Name(Enum):
-    startpos = 0
+class AttacksType:
+    defend = 0
+    attackfromkeeper = 1
+    solokick = 3
+    nemeshat2 = 4
+
 
 
 class Attacker1:
@@ -93,7 +97,7 @@ class Attacker1:
             elif self.attack == 1:
                 
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
-                if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
+                if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51 and field.is_ball_in(field.y_team[attacker1_id]) == True:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
                     field.strategy_image.draw_circle(aux.Point(1000 * field.polarity, -800 * field.polarity), (0, 0, 0), 20)
@@ -110,10 +114,13 @@ class Attacker1:
                     actions[attacker1_id] = Actions.Kick(field.enemy_goal.down - aux.Point(0, 150*  field.polarity))
                 else:
                     actions[attacker1_id] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -150 * field.polarity))
+
             elif self.attack == 4:
                 field.strategy_image.draw_circle(field.b_team[1].get_pos(), (127, 0, 127), 150)
                 actions[attacker1_id] = Actions.GoToPoint(aux.Point(0, 0), baseAngle)
 
+
+            '''
             elif self.attack == 5:
                 if aux.dist(attacker1_pos, field.ball.get_pos()) < 300 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
@@ -123,6 +130,7 @@ class Attacker1:
             
             elif self.attack == 6:
                 actions[attacker1_id] = Actions.GoToPoint(aux.Point(1000, 300), baseAngle)
+            '''
 
 
 
