@@ -105,7 +105,7 @@ class GoalKeeper:
             self.Point52 = Point51
 
             if aux.nearest_point_in_poly(Point51, field.ally_goal.hull) == Point51:
-                if aux.dist(attacker1_pos, aux.Point(1000 * field.polarity, -800 * field.polarity)) < 30:
+                if aux.dist(attacker1_pos, aux.closest_point_on_line(field.b_team[const.GK].get_pos(), Point51, attacker1_pos, "L")) < 180:
                     actions[goal_keeper_id] = Actions.Kick(attacker1_pos, is_pass = True)
                     field.strategy_image.draw_circle(Point51, (0, 0, 255), 50)
                 elif aux.dist(attacker1_pos, aux.Point(1000*field.polarity, 800 * field.polarity)) < 30:

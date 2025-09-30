@@ -204,12 +204,12 @@ class Attacker1:
                     actions[attacker1_id] = Actions.GoToPoint(field.ally_goal.center + aux.Point(1000, 0), baseAngle)
 
             elif self.attack == 1:
+                actions[attacker1_id] = Actions.GoToPoint(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
                 field.strategy_image.draw_circle(attacker1_pos, (255, 0, 0), 130)
                 if aux.dist(attacker1_pos, field.ball.get_pos()) < 200 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
-                    actions[attacker1_id] = Actions.CatchBall(aux.Point(1000 * field.polarity, -800 * field.polarity), (goal_keeper_pos - attacker1_pos).arg())
-                self.flag = False
+                    actions[attacker1_id] = Actions.CatchBall((aux.closest_point_on_line(field.b_team[const.GK].get_pos(), Point51, attacker1_pos, "L")), (goal_keeper_pos - attacker1_pos).arg())
 
 
             elif self.attack == 3:

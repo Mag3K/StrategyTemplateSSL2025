@@ -11,20 +11,21 @@ from bridge.router.base_actions import Action, Actions, KickActions  # type: ign
 class Attacker2:
     def __init__(self) -> None:
         self.GK = aux.Point(0,0)
-        self.attacker2 = 2
+        self.attacker2 = 0
         self.attacker1 = 1
-        self.a = 0
 
     def kick_b(self, field: fld.Field, actions: list[Optional[Action]]) -> None:
-            if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos():
-                actions[self.attacker2] = Actions.GoToPoint(aux.Point(-1100*field.polarity,-800*field.polarity), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
+            if aux.nearest_point_in_poly(field.ball.get_pos(), [aux.Point(0, -800), aux.Point(0, 800), aux.Point(2250 * field.polarity, 800), aux.Point(2250 * field.polarity, -800)]) == field.ball.get_pos() and aux.dist(field.ball.get_pos(), field.b_team[self.attacker1].get_pos()) < 100:
+                actions[self.attacker2] = Actions.CatchBall(aux.closest_point_on_line(field.ball.get_pos(), field.b_team[self.attacker1].get_pos(), field.b_team[self.attacker2].get_pos()), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
             elif aux.nearest_point_in_poly(field.ball.get_pos(), field.enemy_goal.hull) == field.ball.get_pos():
                     actions[self.attacker2] = Actions.GoToPoint(aux.Point(0,0), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
-            elif aux.dist(field.b_team[self.attacker2].get_pos(), field.ball.get_pos()) < 200:
+            elif aux.dist(field.b_team[self.attacker2].get_pos(), field.ball.get_pos()) < 300:
                 if aux.dist(self.GK, field.enemy_goal.down) > aux.dist(self.GK, field.enemy_goal.up): 
                     actions[self.attacker2] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -100*field.polarity))
                 else:
                     actions[self.attacker2] = Actions.Kick(field.enemy_goal.down - aux.Point(0, 100*field.polarity))
+            else:
+                 actions[self.attacker2] = Actions.GoToPoint(aux.Point(-1100*field.polarity,-800*field.polarity), (field.b_team[self.attacker1].get_pos() - field.b_team[self.attacker2].get_pos()).arg())
 
     def checker_b(self, field:fld.Field) -> None:
         for i in range(0, 10):

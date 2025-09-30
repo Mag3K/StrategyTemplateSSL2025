@@ -26,7 +26,7 @@ class Strategy:
         self.GoalKeeper = GoalKeeper()
         self.Attacker2 = Attacker2()
         self.attacker1_id_global = 1
-        self.attacker2_id_global = 2
+        self.attacker2_id_global = 0
 
     def process(self, field: fld.Field) -> list[Optional[Action]]:
         """Game State Management"""
@@ -133,7 +133,7 @@ class Strategy:
                                     self.GK = field.y_team[i].get_pos()
                                     field.strategy_image.draw_circle(self.GK, (0, 0, 0), 150)
                             field.strategy_image.draw_circle(field.b_team[1].get_pos(), (127, 0, 0), 150)
-                            if aux.dist(const.GK, field.enemy_goal.down) > aux.dist(const.GK, field.enemy_goal.up): 
+                            if aux.dist(field.y_team[const.ENEMY_GK].get_pos(), field.enemy_goal.down) > aux.dist(field.y_team[const.ENEMY_GK].get_pos(), field.enemy_goal.up): 
                                 actions[self.attacker1_id_global] = Actions.Kick(field.enemy_goal.down - aux.Point(0, 150 * field.polarity))
                             else:
                                 actions[self.attacker1_id_global] = Actions.Kick(field.enemy_goal.up - aux.Point(0, -150 * field.polarity))
