@@ -8,13 +8,6 @@ from bridge.auxiliary import aux, fld, rbt  # type: ignore
 from bridge.const import State as GameStates
 from bridge.router.base_actions import Action, Actions, KickActions  # type: ignore
 
-class AttacksType:
-    defend = 0
-    attackfromkeeper = 1
-    solokick = 3
-    nemeshat2 = 4
-
-
 
 class Attacker1:
 
@@ -22,9 +15,9 @@ class Attacker1:
     def __init__(self) -> None:
         self.Point52 = aux.Point(0, 0)
         self.GK = aux.Point(0, 0)
-        publicattack = 0
         self.timer: Optional[float] = None
         self.flag = False
+        self.attack = 0
 
     def go(self, field: fld.Field, actions: list[Optional[Action]], attacker1_id: int, attacker2_id: int, goal_keeper_id: int) -> None:
         if field.ally_color == const.Color.YELLOW: #-------------YELLOW--------------------------------------------------
@@ -210,7 +203,7 @@ class Attacker1:
                 if aux.dist(attacker1_pos, field.ball.get_pos()) < 200 and aux.nearest_point_in_poly(Point51, field.ally_goal.hull) != Point51:
                     actions[attacker1_id] = Actions.Kick(attacker2_pos, is_pass = True)
                 else:
-                    actions[attacker1_id] = Actions.CatchBall(aux.nearest_point_in_poly(attacker1_pos, aux.line_circle_intersect(field.b_team[const.GK].get_pos(), Point51, field.b_team[const.GK].get_pos(), 1500.0, "L")), (goal_keeper_pos - attacker1_pos).arg())
+                    actions[attacker1_id] = Actions.CatchBall(aux.nearest_point_on_poly(attacker1_pos, aux.line_circle_intersect(field.b_team[const.GK].get_pos(), Point51, field.b_team[const.GK].get_pos(), 1250.0, "L")), (goal_keeper_pos - attacker1_pos).arg())
 
 
             elif self.attack == 3:
